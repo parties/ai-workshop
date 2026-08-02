@@ -1,7 +1,7 @@
 # Stop Re-Explaining Yourself
 
 **CTE Workshop — August 2026**
-Eric Ogden · high school CS teacher (AP CSP, AP CS A, Cybersecurity, Intro to CS, Esports Careers, Video Game Design) · 12 years as a software engineer before teaching.
+Eric Ogden · high school CS teacher (AP CSP, AP CS A, Cybersecurity, Intro to CS, Video Game Design) · 12 years as a software engineer before teaching.
 
 Everything from the session is here. Nothing gated, no signup.
 
@@ -9,11 +9,11 @@ Everything from the session is here. Nothing gated, no signup.
 
 ## Do this first — the whole activity, in one place
 
-1. Find an assignment your students **AI'd their way through** last year
-2. Open your AI — new **Project** (Claude) / **Gem** (Gemini) / **Custom GPT** (ChatGPT)
-3. Upload **[`framework.md`](framework.md)**
-4. Paste the **[conversion prompt](conversion-prompt.md)**, attach your assignment
-5. Read what comes back — then **push back on it**
+1. Find an assignment your students **AI'd their way through** last year; save it as a file (txt, docx, pdf, md, html, doesn't matter)
+2. Open your AI of choice — new **Project** (Claude) / **Gem** (Gemini) / **Custom GPT** (ChatGPT)
+3. Upload **[`framework.md`](framework.md)** to your project/gem/custom GPT
+4. Paste the **[conversion prompt](conversion-prompt.md)** into the chat, attach your assignment
+5. Read what comes back — then **push back on it**, *iterate*
 
 Didn't bring an assignment? Use **[`sample-assignment.md`](sample-assignment.md)** — it has a
 filled-in context block, so you can be running in about thirty seconds.
