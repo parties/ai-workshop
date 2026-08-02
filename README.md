@@ -19,6 +19,9 @@ Didn't bring an assignment? Use **[`resources/sample-assignment.md`](resources/s
 plus the **[prefilled prompt](prompts/conversion-prompt-prefilled.md)** — context already
 written for you, zero edits, running in about thirty seconds.
 
+**Want it click by click?** → **[`WALKTHROUGH.md`](WALKTHROUGH.md)** — every step on all three
+platforms, what good output looks like, and how to push back when it isn't.
+
 > **Upload your assignment, not your students' work.** If you want to show it what a kid
 > actually turned in, strip the name first. See [Student privacy](#student-privacy).
 
