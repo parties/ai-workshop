@@ -55,28 +55,108 @@ Nothing else in this assignment works until this table is filled in.
 
 ## Part 2 — Build your prompt
 
-Fill in every bracket. Walk the shop and look if you have to. Vague answers here produce vague
-output, and it will be obvious.
+You're writing this one. There's no template to copy — building the prompt **is** the work.
 
-> **Prioritize** the five hazards below by how likely each one is to injure a first-year
-> student in our shop. Give me **a ranked table with one column for your reasoning and one
-> column for a specific control measure.**
->
-> Do this **twice.** First as **the owner of a collision center who is judged on cycle time and
-> insurer turnaround.** Then as **an OSHA compliance officer walking the shop during an
-> inspection.**
->
-> Context: students are ages [___], in a high school CTE program, in the shop [___] hours per
-> week. Our shop has [booth type, number of bays, lifts, welder type, dust extraction — list
-> what's actually here]. The PPE available to us is [___]. Do not assume equipment I haven't
-> listed. These hazards come from tasks the students actually performed: [paste your Part 1
-> log].
+The structure is:
+
+```
+Verb -> Format -> Voice -> Context
+```
+
+### Verb — the thinking move
+
+What you're asking the AI to *do*. It needs judgment in it.
+
+For this assignment, your verb has to produce an **order** — a first, second, third — because
+Part 3 compares two rankings against each other.
+
+**Some that work:** prioritize · rank · triage · weigh · evaluate
+
+**Avoid:** write · explain · list · describe · summarize · tell me about
+
+Those last ones ask for retrieval. You'll get a paragraph that sounds fine and can't be checked.
+
+### Format — the shape of the answer
+
+Pick a shape where a hole is *visible*. If the AI skips its reasoning on hazard #3, you should
+be able to see the empty spot.
+
+**Some that work:**
+
+- ranked table with a reasoning column
+- ranked table with reasoning *and* control measure columns
+- ranked list where each item states what would move it up or down
+- matrix scoring each hazard on severity and likelihood
+
+Whatever you pick has to give you **a rank for each hazard and a reason for each hazard.**
+Those two things feed Part 3.
+
+### Voice — whose perspective
+
+This changes the answer more than anything else you'll write. The AI doesn't have opinions. It
+simulates whoever you tell it to be. Say nothing, and you get a generic safety-poster voice.
+
+You need **two voices that would genuinely disagree.**
+
+**Candidates:**
+
+- the owner of a collision center, judged on cycle time
+- an OSHA compliance officer mid-inspection
+- a workers' comp claims adjuster
+- a painter with 25 years in the booth
+- a student in their first week
+- an insurance adjuster deciding whether to keep the shop on a DRP
+- a parent of a first-year student
+- you, at 45, looking back
+
+Pick two, or invent your own — an invented pair that actually clashes beats a safe pair off the
+list.
+
+**Test before you run it:** can you say *why* these two would rank things differently? If you
+can't, pick a different pair.
+
+### Context — the real details
+
+No list for this one. You have to write it, because you're the one who's been in the shop.
+
+Everything you leave out, the AI invents. It invents the generic version.
+
+**Your context has to answer:**
+
+- Who are these students? Age, program, hours per week in the shop.
+- What's actually in our shop? Booth type, bays, lifts, welder, extraction — and what's missing.
+- What PPE is actually available, and what condition is it in?
+- What are the hazards? (Your Part 1 log.)
+- What should the AI **not** assume? Tell it directly not to invent equipment you didn't list.
+
+### Putting it together
+
+Verb → format → voice → context reads naturally, but the order isn't a rule.
+
+Here's the shape, on a completely different subject so you can't lift it:
+
+> **Rank** *(verb)* these five kitchen stations by fire risk, **as a table with a reason and a
+> control for each one** *(format)*, **first as a line cook on a Saturday night, then as a fire
+> marshal doing an annual inspection** *(voice)*. **Context:** 12-seat restaurant, one
+> extinguisher by the back door, no hood suppression over the fryer, three cooks, ages 19–24.
+> Don't assume equipment I haven't listed. *(context)*
+
+Yours should look nothing like that.
+
+### Before you hit enter
+
+Read your prompt back and point at each of the four parts. If one of them isn't there, the AI
+will fill it in for you — and you won't like what it picks.
+
+**Turn in with your prompt:** one sentence on why you chose those two voices.
 
 ---
 
 ## Part 3 — Compare the two answers
 
-| Hazard | Owner's rank | Inspector's rank | Why the two disagree | Which is right *for our shop*, and why |
+Write your two voices into the header before you fill it in.
+
+| Hazard | Rank — voice 1: ________ | Rank — voice 2: ________ | Why the two disagree | Which is right *for our shop*, and why |
 |---|---|---|---|---|
 | | | | | |
 
@@ -121,7 +201,7 @@ other one was seeing that made it rank things differently.
 ## What to turn in
 
 - [ ] Part 1 — hazard log
-- [ ] Part 2 — your prompt, with the brackets filled in
+- [ ] Part 2 — your prompt, plus one sentence on why you chose those two voices
 - [ ] Part 3 — comparison table
 - [ ] Part 4 — three corrections
 - [ ] Part 5 — your defense
@@ -133,7 +213,7 @@ other one was seeing that made it rank things differently.
 | Criterion | Points |
 |---|---|
 | Hazard log — five real tasks, specific tools and materials, honest PPE column | 10 |
-| Prompt — all four parts present, context filled with real shop conditions | 15 |
+| Prompt — all four parts present and deliberately chosen; two voices that actually clash; context written from real shop conditions | 15 |
 | Comparison — the two rankings genuinely differ, and you explain *why* rather than restate them | 10 |
 | Corrections — three real, specific findings about our shop | 10 |
 | Your call — a position taken and supported | 5 |
