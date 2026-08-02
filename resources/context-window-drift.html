@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context isn't a bucket — a PD demo on context windows and drift</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202B;
+  --ink-2:#3A4A5A;
+  --ink-3:#6B7C8C;
+  --paper:#E8EDF1;
+  --paper-2:#F3F6F8;
+  --rule:#C3CFD9;
+  --anchor:#2F6F8F;
+  --signal:#E5920C;
+  --decay:#A33A28;
+  --sys:#54687C;
+  --turn:#AEBECB;
+
+  --display:"IBM Plex Sans Condensed","Helvetica Neue",Arial Narrow,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+
+  --gut:clamp(18px,4vw,44px);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.55;
+  background-image:
+    linear-gradient(to right, rgba(107,124,140,.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(107,124,140,.07) 1px, transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--gut)}
+
+a{color:var(--anchor)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:2px}
+
+/* ---------- section framing ---------- */
+.band{border-top:1px solid var(--rule);padding:clamp(38px,6vw,76px) 0}
+.band-label{
+  font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);display:flex;align-items:baseline;gap:14px;margin-bottom:26px;
+}
+.band-label::after{content:"";flex:1;height:1px;background:var(--rule)}
+h2{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(30px,5vw,52px);line-height:1.02;letter-spacing:-.015em;
+  margin:0 0 .5em;max-width:20ch;
+}
+h3{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.01em;margin:0 0 8px}
+p{margin:0 0 1em;max-width:68ch}
+.lede{font-size:clamp(18px,2vw,21px);color:var(--ink-2);max-width:62ch}
+strong{font-weight:600}
+code{font-family:var(--mono);font-size:.88em;background:rgba(47,111,143,.1);padding:1px 5px;border-radius:3px}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(44px,8vw,96px) 0 clamp(34px,5vw,60px)}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:clamp(20px,4vw,38px);
+}
+.eyebrow b{color:var(--signal);font-weight:500}
+h1{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(52px,13vw,148px);line-height:.87;letter-spacing:-.03em;
+  margin:0 0 .28em;text-transform:uppercase;
+}
+h1 .thin{display:block;color:var(--anchor)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,5vw,64px);align-items:end}
+@media(max-width:800px){.hero-grid{grid-template-columns:1fr}}
+
+/* ---------- panel A loop ---------- */
+.loop{
+  background:var(--paper-2);border:1px solid var(--rule);padding:18px;
+}
+.loop-head{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);display:flex;justify-content:space-between;margin-bottom:12px;
+}
+.loop-stack{display:flex;flex-direction:column;gap:3px;min-height:176px;justify-content:flex-end}
+.loop-card{
+  height:16px;border-radius:2px;transform-origin:center;
+  animation:dealIn .34s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes dealIn{from{opacity:0;transform:translateY(-9px) scaleX(.94)}to{opacity:1;transform:none}}
+.loop-send{
+  margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;
+}
+.loop-send .fire{color:var(--signal);opacity:0;transition:opacity .16s}
+.loop-send .fire.on{opacity:1}
+
+/* ---------- two-up explainer ---------- */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,52px)}
+@media(max-width:800px){.duo{grid-template-columns:1fr}}
+
+.note{
+  border-left:3px solid var(--signal);padding:2px 0 2px 18px;margin:26px 0;
+  max-width:66ch;
+}
+.note .tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--signal);display:block;margin-bottom:4px;
+}
+.note p{margin:0}
+
+/* ---------- simulator ---------- */
+.sim{border:1px solid var(--rule);background:var(--paper-2);margin-top:8px}
+.transport{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  padding:14px 16px;border-bottom:1px solid var(--rule);background:var(--ink);color:var(--paper);
+}
+.btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--paper);border:1px solid rgba(232,237,241,.35);
+  padding:8px 14px;cursor:pointer;border-radius:2px;transition:background .15s,border-color .15s;
+}
+.btn:hover:not(:disabled){background:rgba(232,237,241,.14);border-color:rgba(232,237,241,.7)}
+.btn:disabled{opacity:.32;cursor:default}
+.btn.primary{background:var(--signal);border-color:var(--signal);color:var(--ink);font-weight:600}
+.btn.primary:hover{background:#f2a52c;border-color:#f2a52c}
+.turnread{
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  margin-left:auto;color:rgba(232,237,241,.72);
+}
+.turnread b{color:var(--paper);font-weight:600}
+
+.scrub{
+  -webkit-appearance:none;appearance:none;flex:1 1 190px;min-width:130px;height:22px;background:transparent;cursor:pointer;
+}
+.scrub::-webkit-slider-runnable-track{height:2px;background:rgba(232,237,241,.35)}
+.scrub::-moz-range-track{height:2px;background:rgba(232,237,241,.35)}
+.scrub::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--signal);margin-top:-6px}
+.scrub::-moz-range-thumb{width:13px;height:13px;border:0;border-radius:50%;background:var(--signal)}
+
+.lanes{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:800px){.lanes{grid-template-columns:1fr}}
+.lane{padding:20px 18px 22px}
+.lane + .lane{border-left:1px solid var(--rule)}
+@media(max-width:800px){.lane + .lane{border-left:0;border-top:1px solid var(--rule)}}
+
+.lane-head{display:flex;align-items:baseline;gap:9px;margin-bottom:3px}
+.lane-head h4{font-family:var(--display);font-weight:700;font-size:23px;margin:0;letter-spacing:.01em}
+.lane-head .dot{width:9px;height:9px;border-radius:50%;flex:none;transform:translateY(-1px)}
+.lane-sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-bottom:16px;letter-spacing:.04em}
+
+.stack-frame{position:relative;border:1px solid var(--rule);background:#fff;padding:5px}
+.stack{position:relative;display:flex;flex-direction:column;gap:2px;height:250px;overflow:hidden}
+.seg{border-radius:1px;position:relative;overflow:hidden;transition:height .3s cubic-bezier(.2,.8,.3,1),opacity .3s;min-height:2px}
+.seg .seg-label{
+  position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;white-space:nowrap;pointer-events:none;
+}
+.seg.lite .seg-label{color:var(--ink-2)}
+.scrim{
+  position:absolute;inset:5px;pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.12) 14%,
+    rgba(255,255,255,.62) 50%,
+    rgba(255,255,255,.12) 86%,
+    rgba(255,255,255,0) 100%);
+}
+.scrim-key{
+  position:absolute;right:9px;top:50%;transform:translateY(-50%) rotate(180deg);
+  writing-mode:vertical-rl;font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);pointer-events:none;
+}
+
+.evicted{
+  margin-top:8px;min-height:34px;border:1px dashed var(--rule);padding:6px 8px;
+  font-family:var(--mono);font-size:10.5px;color:var(--decay);letter-spacing:.04em;
+  display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;
+}
+.evicted .ph{color:var(--ink-3);text-decoration:none}
+.evicted span{text-decoration:line-through}
+
+.meter{margin-top:16px}
+.meter-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.meter-name{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.meter-val{font-family:var(--display);font-weight:700;font-size:27px;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.bar{height:7px;background:var(--rule);position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;transition:width .34s cubic-bezier(.2,.8,.3,1);display:block}
+.meter-foot{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;letter-spacing:.03em;min-height:14px}
+.meter-foot.warn{color:var(--decay)}
+
+.exchange{border-top:1px solid var(--rule);padding:18px}
+.msg{margin-bottom:12px}
+.msg:last-child{margin-bottom:0}
+.who{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.msg p{font-size:15.5px;margin:0;max-width:none}
+.replies{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+@media(max-width:800px){.replies{grid-template-columns:1fr}}
+.reply{border-left:3px solid var(--rule);padding:2px 0 2px 12px;font-family:var(--mono);font-size:13px;line-height:1.5}
+.reply.plain{border-color:var(--turn)}
+.reply.proj{border-color:var(--anchor)}
+.reply.broken{border-color:var(--decay);color:var(--decay)}
+.flag{
+  display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--decay);color:#fff;padding:1px 6px;border-radius:2px;margin-top:6px;
+}
+.flag.ok{background:var(--anchor)}
+.plant-mark{
+  display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--signal);color:var(--ink);padding:1px 6px;border-radius:2px;margin-left:8px;font-weight:600;
+}
+
+/* ---------- causes ---------- */
+.causes{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:12px}
+@media(max-width:760px){.causes{grid-template-columns:1fr}}
+.cause{background:var(--paper-2);padding:22px 20px}
+.cause .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);margin-bottom:8px}
+.cause p{font-size:15.5px;margin:0;color:var(--ink-2)}
+.cause p + p{margin-top:.7em}
+
+/* ---------- trap ---------- */
+.trap{border:1px solid var(--rule);background:var(--paper-2);padding:22px;margin-top:12px}
+.trap-bar{display:flex;height:44px;border:1px solid var(--rule);background:#fff;overflow:hidden}
+.trap-bar div{transition:width .18s;position:relative}
+.trap-bar span{
+  position:absolute;left:8px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+}
+.trap-ctl{display:flex;align-items:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+.trap-ctl label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.trap-slider{-webkit-appearance:none;appearance:none;flex:1 1 240px;height:22px;background:transparent;cursor:pointer}
+.trap-slider::-webkit-slider-runnable-track{height:2px;background:var(--rule)}
+.trap-slider::-moz-range-track{height:2px;background:var(--rule)}
+.trap-slider::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--anchor);margin-top:-7px}
+.trap-slider::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:50%;background:var(--anchor)}
+.trap-read{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+@media(max-width:640px){.trap-read{grid-template-columns:1fr}}
+.stat .n{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-top:4px}
+.verdict{margin-top:18px;font-size:15.5px;color:var(--ink-2);min-height:3em}
+.verdict b{color:var(--decay)}
+
+/* ---------- talk track ---------- */
+.track{border-top:1px solid var(--rule)}
+.track details{border-bottom:1px solid var(--rule)}
+.track summary{
+  cursor:pointer;padding:16px 0;font-family:var(--display);font-weight:700;font-size:20px;
+  display:flex;align-items:center;gap:12px;list-style:none;
+}
+.track summary::-webkit-details-marker{display:none}
+.track summary::before{
+  content:"+";font-family:var(--mono);font-size:17px;color:var(--signal);width:15px;flex:none;
+}
+.track details[open] summary::before{content:"\2212"}
+.track .body{padding:0 0 20px 27px;max-width:74ch}
+.track .body p{font-size:16px}
+.track .say{
+  border-left:3px solid var(--anchor);padding:2px 0 2px 14px;margin:14px 0;
+  font-style:italic;color:var(--ink-2);
+}
+.track ul{margin:0 0 1em;padding-left:20px;max-width:70ch}
+.track li{margin-bottom:.45em;font-size:16px}
+
+footer{border-top:1px solid var(--rule);padding:30px 0 60px;color:var(--ink-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.05em}
+footer p{max-width:74ch;font-size:11.5px;line-height:1.7}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <div class="eyebrow">Professional development &nbsp;/&nbsp; <b>How LLM context actually works</b> &nbsp;/&nbsp; 25 min + discussion</div>
+  <div class="hero-grid">
+    <div>
+      <h1>Context<br>isn't a<span class="thin">bucket</span></h1>
+      <p class="lede">The window doesn't fill up. It's torn down and rebuilt from scratch on every single turn — and an instruction can lose its grip on the model long before anything runs out of room.</p>
+    </div>
+    <div class="loop" aria-hidden="true">
+      <div class="loop-head"><span>Payload, per request</span><span id="loopTurn">turn 1</span></div>
+      <div class="loop-stack" id="loopStack"></div>
+      <div class="loop-send"><span>assembled &rarr; sent &rarr; discarded</span><span class="fire" id="loopFire">send</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MECHANISM ============ -->
+<section class="band wrap">
+  <div class="band-label">Mechanism</div>
+  <h2>Every turn is a cold start</h2>
+  <div class="duo">
+    <div>
+      <p>A language model keeps nothing between messages. There is no session, no running memory, no buffer sitting on a server with your conversation in it.</p>
+      <p>When you press send, the client assembles one flat block of text — system prompt, then every previous message in the thread, then what you just typed — and runs it through the model in a single pass. The model reads all of it as if for the first time. Then it's thrown away.</p>
+      <p>The <strong>context window</strong> is the size limit on that re-sent block. Not a tank that fills. A page-length limit on a document that gets retyped, longer each time, before every reply.</p>
+    </div>
+    <div>
+      <div class="note">
+        <span class="tag">Why this framing matters</span>
+        <p>If you teach the bucket metaphor, Projects look like magic. Once you teach reassembly, Projects are obvious: they're just text that gets pasted into the top of the block every time it's rebuilt. Same mechanism, no new machinery.</p>
+      </div>
+      <div class="note">
+        <span class="tag">The part people get wrong</span>
+        <p>Overflow behaviour isn't the model's — it's the app's. On the raw API, too much text returns an error and nothing is silently dropped. Chat products each choose their own policy: cut the oldest turns, compress earlier ones into a summary, or fetch only relevant pieces on demand. "It forgets the beginning" describes one product's choice, not a law of LLMs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMONSTRATION ============ -->
+<section class="band wrap">
+  <div class="band-label">Demonstration</div>
+  <h2>The same conversation, run twice</h2>
+  <p class="lede">Both lanes get identical messages. On turn 2 the user sets a rule. Watch how long each lane actually holds onto it — and watch when fidelity starts falling relative to how full the window is.</p>
+
+  <div class="sim">
+    <div class="transport">
+      <button class="btn" id="back" aria-label="Previous turn">&#9664; Back</button>
+      <button class="btn primary" id="play">Play</button>
+      <button class="btn" id="reset">Reset</button>
+      <input class="scrub" id="scrub" type="range" min="0" max="21" value="0" aria-label="Scrub through conversation turns">
+      <div class="turnread">Turn <b id="tnum">1</b> / <span id="ttot">22</span></div>
+    </div>
+
+    <div class="lanes">
+      <div class="lane">
+        <div class="lane-head"><span class="dot" style="background:var(--turn)"></span><h4>Plain chat</h4></div>
+        <div class="lane-sub">Rule lives in the transcript, like any other message</div>
+        <div class="stack-frame">
+          <div class="stack" id="stackA"></div>
+          <div class="scrim"></div>
+          <div class="scrim-key">attention dips mid-payload</div>
+        </div>
+        <div class="evicted" id="evictA"><span class="ph">nothing dropped yet</span></div>
+        <div class="meter">
+          <div class="meter-top"><span class="meter-name">Window occupancy</span><span class="meter-val" id="occAv">—</span></div>
+          <div class="bar"><i id="occA" style="background:var(--sys)"></i></div>
+          <div class="meter-foot" id="occAf"></div>
+        </div>
+        <div class="meter">
+          <div class="meter-top"><span class="meter-name">Rule fidelity</span><span class="meter-val" id="fidAv">—</span></div>
+          <div class="bar"><i id="fidA" style="background:var(--signal)"></i></div>
+          <div class="meter-foot" id="fidAf"></div>
+        </div>
+      </div>
+
+      <div class="lane">
+        <div class="lane-head"><span class="dot" style="background:var(--anchor)"></span><h4>Project chat</h4></div>
+        <div class="lane-sub">Rule is pinned at the top of every rebuild</div>
+        <div class="stack-frame">
+          <div class="stack" id="stackB"></div>
+          <div class="scrim"></div>
+          <div class="scrim-key">attention dips mid-payload</div>
+        </div>
+        <div class="evicted" id="evictB"><span class="ph">nothing dropped yet</span></div>
+        <div class="meter">
+          <div class="meter-top"><span class="meter-name">Window occupancy</span><span class="meter-val" id="occBv">—</span></div>
+          <div class="bar"><i id="occB" style="background:var(--sys)"></i></div>
+          <div class="meter-foot" id="occBf"></div>
+        </div>
+        <div class="meter">
+          <div class="meter-top"><span class="meter-name">Rule fidelity</span><span class="meter-val" id="fidBv">—</span></div>
+          <div class="bar"><i id="fidB" style="background:var(--signal)"></i></div>
+          <div class="meter-foot" id="fidBf"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg">
+        <div class="who">User <span id="plantMark"></span></div>
+        <p id="userMsg">—</p>
+      </div>
+      <div class="replies">
+        <div>
+          <div class="who">Plain chat replies</div>
+          <div class="reply plain" id="replyA">—</div>
+        </div>
+        <div>
+          <div class="who">Project chat replies</div>
+          <div class="reply proj" id="replyB">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:26px">
+    <span class="tag">Read the two meters against each other</span>
+    <p>Around turn 12 the plain lane is roughly 60% full and the rule is already at about half strength. Nothing has been deleted. That gap between the meters is the whole lesson: <strong>drift is a signal-to-noise problem, not a capacity problem.</strong> Running out of room is where it ends, not where it starts.</p>
+  </div>
+</section>
+
+<!-- ============ DIAGNOSIS ============ -->
+<section class="band wrap">
+  <div class="band-label">Diagnosis</div>
+  <h2>Four reasons it slips</h2>
+  <p class="lede">Only the last one involves running out of space. The first three are already at work in a window that's half empty.</p>
+  <div class="causes">
+    <div class="cause">
+      <div class="k">Lost in the middle</div>
+      <p>Attention isn't spread evenly across the payload. Material at the very beginning and the very end gets used reliably; material buried in the middle gets used measurably less. This is a well-documented effect in long-context evaluation.</p>
+      <p>A rule given on turn 2 starts out at the end of a short payload — the strongest position there is. Twenty turns later it hasn't moved, but the payload has grown around it, and it now sits dead centre. Same text, worse seat.</p>
+    </div>
+    <div class="cause">
+      <div class="k">Dilution</div>
+      <p>Present is not the same as weighted. Fifty words of instruction compete against forty turns of code, questions, and corrections — all of it equally readable, all of it pulling.</p>
+      <p>The instruction never got weaker. Everything else got louder.</p>
+    </div>
+    <div class="cause">
+      <div class="k">Self-conditioning</div>
+      <p>The model's own previous replies are part of its input. Whatever it did on turn 5 is evidence for what turn 20 should look like.</p>
+      <p>So one small slip becomes precedent, and precedent compounds. This is why drift accelerates instead of holding steady — and why correcting early costs far less than correcting late.</p>
+    </div>
+    <div class="cause">
+      <div class="k">Eviction and compaction</div>
+      <p>Only now does capacity matter. The app hits its ceiling and does something: drop the oldest turns, or squeeze earlier ones into a summary.</p>
+      <p>Compaction is the sneakier one. The gist survives, the specifics evaporate, and the transcript still looks complete — so the loss is invisible right up until the model contradicts something you're certain you said.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRADE-OFF ============ -->
+<section class="band wrap">
+  <div class="band-label">Trade-off</div>
+  <h2>Pinned context isn't free</h2>
+  <p class="lede">Everything you pin is spent before the conversation says a word. It's a floor you set — and a ceiling you lower.</p>
+
+  <div class="trap">
+    <div class="trap-bar" id="trapBar">
+      <div id="tSys" style="background:var(--sys)"><span style="color:#fff">System</span></div>
+      <div id="tPin" style="background:var(--anchor)"><span style="color:#fff">Pinned</span></div>
+      <div id="tFree" style="background:var(--paper-2)"><span style="color:var(--ink-2)">Room to talk</span></div>
+    </div>
+    <div class="trap-ctl">
+      <label for="pinSize">Pinned project content</label>
+      <input class="trap-slider" id="pinSize" type="range" min="0" max="640" step="20" value="90" aria-label="Size of pinned project content in tokens">
+      <span class="meter-val" id="pinRead" style="font-size:22px">90</span>
+    </div>
+    <div class="trap-read">
+      <div class="stat"><div class="n" id="statRoom">—</div><div class="l">Tokens left for conversation</div></div>
+      <div class="stat"><div class="n" id="statTurns">—</div><div class="l">Turns before first eviction</div></div>
+      <div class="stat"><div class="n" id="statPct">—</div><div class="l">Window spent before turn 1</div></div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <div class="note" style="margin-top:26px">
+    <span class="tag">The other caveat worth naming out loud</span>
+    <p>Short pinned instructions are included verbatim. Large uploaded knowledge bases often aren't — many systems retrieve the relevant chunks instead of inserting the whole library. So "I put it in the Project" guarantees availability, not presence. If a specific sentence must be obeyed every time, it belongs in the instructions, not in an attached document.</p>
+  </div>
+</section>
+
+<!-- ============ TALK TRACK ============ -->
+<section class="band wrap">
+  <div class="band-label">Talk track</div>
+  <h2>Running this with a room</h2>
+  <div class="track">
+
+    <details open>
+      <summary>Open by surfacing the wrong model — don't correct it yet</summary>
+      <div class="body">
+        <p>Ask the room to describe, in their own words, what happens to a long chat. You will reliably get some version of "it fills up and forgets the oldest stuff." Write it on the board. Leave it there.</p>
+        <p class="say">"Hold that. We're going to come back and change one word in it."</p>
+        <p>It's a productive wrong answer — right about the ceiling, wrong about the mechanism. Letting people commit to it out loud makes the correction land harder than pre-empting it.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Land the reassembly idea before touching the simulator</summary>
+      <div class="body">
+        <p>Physical demo that costs nothing: read a sentence aloud from an index card, then hand the card to someone and walk out of the room. Come back with no memory of it. To continue, someone has to hand you every card again, in order, including your own previous ones.</p>
+        <p class="say">"That's every turn. Not a conversation — a stack of cards re-dealt, one card longer, and I read the whole stack again before I say anything."</p>
+        <ul>
+          <li>The model isn't remembering. The app is re-sending.</li>
+          <li>The window is a limit on the stack height, not a container being filled.</li>
+          <li>My own previous cards are in the stack — that detail pays off in the third panel.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Drive the simulator — step, don't play</summary>
+      <div class="body">
+        <p>Play is for a second pass. First time through, step manually and stop at three moments:</p>
+        <ul>
+          <li><strong>Turn 2.</strong> The rule is planted. Both lanes read 100. Point out the amber block sitting at the <em>bottom</em> of the plain lane's stack — right now it's the most recent thing said, the best possible position.</li>
+          <li><strong>Turn 12.</strong> Occupancy near 60%, plain fidelity near 50%. This is the moment worth the pause. Nothing has been deleted, no limit has been hit, and the rule is already at half strength. Ask what they think happened.</li>
+          <li><strong>Turn 19–20.</strong> Eviction. The amber block falls off the plain lane entirely. The project lane also overflows — but it sheds conversation, not the rule.</li>
+        </ul>
+        <p class="say">"Both of them ran out of room. Only one of them lost the instruction. That's the whole argument for Projects."</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Corrections to make explicitly, once they've seen it</summary>
+      <div class="body">
+        <p>Go back to the board and fix the sentence from the opening. Three edits:</p>
+        <ul>
+          <li><strong>"Fills up" &rarr; "gets rebuilt."</strong> Nothing accumulates; the payload is reassembled every turn.</li>
+          <li><strong>"Forgets" &rarr; "the app drops or compresses."</strong> It's a product decision, and different products decide differently. The raw API just errors.</li>
+          <li><strong>"When it's full" &rarr; "long before it's full."</strong> Position, dilution, and self-conditioning are already degrading things at half capacity.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Close on practice, not theory</summary>
+      <div class="body">
+        <p>The four habits that fall out of this, in order of payoff:</p>
+        <ul>
+          <li><strong>Start a new chat more often than feels necessary.</strong> The strongest thing Projects do isn't persistence — it's letting every new thread start from a clean floor instead of inheriting forty turns of accumulated drift.</li>
+          <li><strong>Correct on the first slip.</strong> Self-conditioning means a tolerated mistake becomes the pattern. Cheap on turn 6, expensive on turn 26.</li>
+          <li><strong>Restate the constraint right before the work that depends on it.</strong> The end of the payload is a high-attention position. Using it is free.</li>
+          <li><strong>Pin the short rules, not the whole library.</strong> Pinned content is spent budget, and big attachments may be retrieved rather than included.</li>
+        </ul>
+        <p class="say">"You're not managing its memory. You're managing what gets retyped, and where in the page it lands."</p>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<footer class="wrap">
+  <p><strong>About the model behind the demo.</strong> The window is scaled to 1,000 units so the arithmetic stays visible on a projector — real windows run to hundreds of thousands of tokens. The fidelity meter is a teaching model, not a measurement: it combines position in the payload, the instruction's shrinking share of the whole, and compounding self-conditioning. The <em>shapes</em> reflect documented long-context behaviour; the specific numbers are illustrative. Worth saying out loud to a room of teachers.</p>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- panel A: the reassembly loop ---------------- */
+var loopStack=document.getElementById("loopStack"),
+    loopFire=document.getElementById("loopFire"),
+    loopTurn=document.getElementById("loopTurn"),
+    loopN=1;
+var COLORS={sys:"#54687C",pin:"#2F6F8F",turn:"#AEBECB",sig:"#E5920C"};
+
+function drawLoop(){
+  loopStack.innerHTML="";
+  var card=document.createElement("div");
+  card.className="loop-card";
+  card.style.background=COLORS.sys;
+  card.style.animationDelay="0ms";
+  loopStack.appendChild(card);
+  for(var i=0;i<loopN;i++){
+    var c=document.createElement("div");
+    c.className="loop-card";
+    c.style.background=(i===1)?COLORS.sig:COLORS.turn;
+    c.style.animationDelay=(70*(i+1))+"ms";
+    loopStack.appendChild(c);
+  }
+  loopTurn.textContent="turn "+loopN;
+  var delay=70*(loopN+1)+320;
+  setTimeout(function(){ loopFire.classList.add("on"); },delay);
+  setTimeout(function(){ loopFire.classList.remove("on"); },delay+560);
+  setTimeout(function(){
+    loopN=(loopN>=8)?1:loopN+1;
+    drawLoop();
+  },delay+1050);
+}
+drawLoop();
+
+/* ---------------- the conversation ---------------- */
+var CAP=1000, SYS=60, PIN=90, PLANT=1; // PLANT is zero-indexed turn 2
+
+var TURNS=[
+ {c:46,u:"I'm building a parser for our gradebook CSV exports.",
+      a:"Setting up a module outline now."},
+ {c:56,u:"Rules for this whole project: snake_case everywhere, standard library only, Python 3.11.",
+      a:"Understood \u2014 snake_case, stdlib only, 3.11."},
+ {c:44,u:"Start with reading the header row.",
+      a:"def parse_header(row): ..."},
+ {c:50,u:"Some fields have commas inside quotes.",
+      a:"Using csv.reader \u2014 it handles quoting for us."},
+ {c:47,u:"Add a validator for student ID format.",
+      a:"def validate_student_id(value): ..."},
+ {c:52,u:"IDs can have a legacy prefix. Handle both.",
+      a:"def normalize_id(raw): strips the prefix first."},
+ {c:45,u:"Now compute weighted category averages.",
+      a:"def weighted_average(scores, weights): ..."},
+ {c:49,u:"Missing scores should be excluded, not zeroed.",
+      a:"Filtering None before the sum \u2014 stdlib only."},
+ {c:51,u:"Add a summary row per student.",
+      a:"def build_summary_row(student): ..."},
+ {c:48,u:"Round the averages to one decimal.",
+      a:"Using round(). Also \u2014 a quick note, parseRow could take a precision arg.",
+      b:"Using round(). parse_row can take a precision arg if you want it configurable.",
+      driftA:"camelCase creeping in"},
+ {c:53,u:"Sort the output by last name.",
+      a:"sortRows() handles it with a key function.",
+      b:"sort_rows() handles it with a key function.",
+      driftA:"camelCase now the default"},
+ {c:47,u:"Write results back out to CSV.",
+      a:"writeOutput() using the csv module.",
+      b:"write_output() using the csv module.",
+      driftA:"naming rule effectively gone"},
+ {c:50,u:"Handle files that are too big for memory.",
+      a:"Streaming row by row \u2014 though pandas.read_csv with chunksize would be cleaner here.",
+      b:"Streaming row by row with csv.reader \u2014 constant memory, no dependencies.",
+      driftA:"suggesting an external library"},
+ {c:55,u:"Add a progress indicator for long files.",
+      a:"pip install tqdm and wrap the loop.",
+      b:"A counter printed every 1000 rows \u2014 stdlib, no install.",
+      driftA:"external dependency proposed outright"},
+ {c:46,u:"What about malformed rows?",
+      a:"try/except around the parse, log and continue.",
+      b:"try/except around the parse, log and continue."},
+ {c:52,u:"Log to a file instead of stdout.",
+      a:"Using the logging module \u2014 configureLogger() sets it up.",
+      b:"Using the logging module \u2014 configure_logger() sets it up.",
+      driftA:"camelCase persists"},
+ {c:49,u:"Add a dry-run flag.",
+      a:"argparse with --dry-run, wired into runPipeline().",
+      b:"argparse with --dry-run, wired into run_pipeline().",
+      driftA:"camelCase persists"},
+ {c:54,u:"Can you show me the full file so far?",
+      a:"Here's the assembled module \u2014 imports pandas and tqdm, camelCase throughout.",
+      b:"Here's the assembled module \u2014 csv, logging, argparse, snake_case throughout.",
+      driftA:"rule violated on every line"},
+ {c:51,u:"Add type hints.",
+      a:"Done \u2014 using the 3.12 type statement syntax.",
+      b:"Done \u2014 3.11-compatible hints, no 3.12-only syntax.",
+      driftA:"wrong Python version"},
+ {c:48,u:"Package it for the other teachers.",
+      a:"pyproject.toml with pandas, tqdm, and requests pinned as dependencies.",
+      b:"pyproject.toml \u2014 no runtime dependencies, requires-python >=3.11.",
+      driftA:"rule is gone from the payload entirely"},
+ {c:53,u:"Remind me \u2014 what were my rules for this project?",
+      a:"I don't have those in front of me \u2014 could you restate them?",
+      b:"snake_case, standard library only, Python 3.11.",
+      driftA:"cannot recover the rule"},
+ {c:50,u:"Refactor the averaging function.",
+      a:"Refactored computeWeightedAverage() using numpy for clarity.",
+      b:"Refactored weighted_average() \u2014 still stdlib, still snake_case.",
+      driftA:"drift is now the established pattern"}
+];
+
+document.getElementById("ttot").textContent=TURNS.length;
+document.getElementById("scrub").max=TURNS.length-1;
+
+/* ---------------- payload construction ---------------- */
+function build(pinned,t){
+  var segs=[{kind:"sys",tok:SYS,label:"System"}];
+  if(pinned) segs.push({kind:"pin",tok:PIN,label:"Project rules",holds:true});
+  for(var i=0;i<=t;i++){
+    var isRule=(!pinned && i===PLANT);
+    segs.push({kind:isRule?"sig":"turn",tok:TURNS[i].c,label:isRule?"THE RULE":"Turn "+(i+1),holds:isRule});
+  }
+  var requested=segs.reduce(function(s,x){return s+x.tok;},0);
+  var evicted=[];
+  var total=requested;
+  while(total>CAP){
+    var idx=-1;
+    for(var j=0;j<segs.length;j++){
+      if(segs[j].kind==="turn"||segs[j].kind==="sig"){idx=j;break;}
+    }
+    if(idx<0) break;
+    total-=segs[idx].tok;
+    evicted.push(segs[idx]);
+    segs.splice(idx,1);
+  }
+  return {segs:segs,total:total,requested:requested,evicted:evicted};
+}
+
+function rawFidelity(p,pinned){
+  var holder=null,before=0,found=false;
+  for(var i=0;i<p.segs.length;i++){
+    if(p.segs[i].holds){holder=p.segs[i];found=true;break;}
+    before+=p.segs[i].tok;
+  }
+  if(!found) return null;
+  var mid=before+holder.tok/2;
+  var pos=mid/p.total;
+  var fullness=Math.min(1,p.total/CAP);
+  var penalty=0.62*Math.pow(fullness,0.8);
+  var posW=1-penalty*Math.pow(Math.sin(Math.PI*pos),1.4);
+  var share=holder.tok/p.total;
+  var baseShare=holder.tok/(SYS+(pinned?PIN:0)+TURNS[0].c+TURNS[1].c);
+  var ratio=Math.min(1,share/baseShare);
+  var dilF=pinned?(0.72+0.28*Math.pow(ratio,0.4)):(0.55+0.45*Math.pow(ratio,0.4));
+  return {posW:posW,dil:dilF,pos:pos};
+}
+
+var BASE={};
+[["A",0],["B",1]].forEach(function(pair){
+  var p=build(pair[1],PLANT);
+  var r=rawFidelity(p,pair[1]);
+  BASE[pair[0]]=r.posW*r.dil;
+});
+
+function fidelity(p,pinned,t,key){
+  var r=rawFidelity(p,pinned);
+  if(!r) return {v:null,pos:null};
+  var since=Math.max(0,t-PLANT);
+  var decay=pinned?0.10:0.35;
+  var selfC=1-decay*(1-Math.exp(-since/14));
+  var raw=r.posW*r.dil*selfC;
+  return {v:Math.max(0,Math.min(100,100*raw/BASE[key])),pos:r.pos};
+}
+
+/* ---------------- rendering ---------------- */
+var SEGCOLOR={sys:"#54687C",pin:"#2F6F8F",sig:"#E5920C",turn:"#AEBECB"};
+
+function renderLane(key,pinned,t){
+  var p=build(pinned,t);
+  var stack=document.getElementById("stack"+key);
+  var H=250, gaps=(p.segs.length-1)*2, avail=H-gaps;
+  var denom=Math.max(p.total,CAP*0.34);
+  stack.innerHTML="";
+  p.segs.forEach(function(s){
+    var d=document.createElement("div");
+    d.className="seg"+(s.kind==="turn"?" lite":"");
+    d.style.background=SEGCOLOR[s.kind];
+    d.style.height=Math.max(2,(s.tok/denom)*avail)+"px";
+    if(s.kind==="sig"||s.kind==="pin"||s.kind==="sys"){
+      var l=document.createElement("span");
+      l.className="seg-label";
+      l.textContent=s.label;
+      d.appendChild(l);
+    }
+    stack.appendChild(d);
+  });
+
+  var ev=document.getElementById("evict"+key);
+  if(p.evicted.length===0){
+    ev.innerHTML='<span class="ph">nothing dropped yet</span>';
+  }else{
+    ev.innerHTML=p.evicted.map(function(s){
+      return "<span>"+(s.kind==="sig"?"THE RULE":s.label)+"</span>";
+    }).join("");
+  }
+
+  var occPct=p.requested/CAP*100;
+  document.getElementById("occ"+key).style.width=Math.min(100,occPct)+"%";
+  document.getElementById("occ"+key).style.background=occPct>=100?"#A33A28":"#54687C";
+  document.getElementById("occ"+key+"v").textContent=Math.round(occPct)+"%";
+  var of=document.getElementById("occ"+key+"f");
+  if(occPct>=100){
+    of.className="meter-foot warn";
+    of.textContent=p.requested+" requested / "+CAP+" cap \u2014 over by "+(p.requested-CAP);
+  }else{
+    of.className="meter-foot";
+    of.textContent=p.requested+" of "+CAP+" tokens";
+  }
+
+  var f=fidelity(p,pinned,t,key);
+  var fv=document.getElementById("fid"+key+"v"),
+      fb=document.getElementById("fid"+key),
+      ff=document.getElementById("fid"+key+"f");
+  if(f.v===null){
+    fv.textContent="\u2014";
+    fv.style.color="#A33A28";
+    fb.style.width="2%";
+    fb.style.background="#A33A28";
+    ff.className="meter-foot warn";
+    ff.textContent="rule evicted \u2014 not in the payload at all";
+  }else{
+    var val=Math.round(f.v);
+    fv.textContent=val;
+    fv.style.color=val<40?"#A33A28":"var(--ink)";
+    fb.style.width=Math.max(2,val)+"%";
+    fb.style.background=val<40?"#A33A28":"#E5920C";
+    ff.className="meter-foot";
+    var where=f.pos<0.2?"near the top \u2014 strong position":(f.pos>0.78?"near the end \u2014 strong position":"buried mid-payload \u2014 weak position");
+    ff.textContent=where;
+  }
+  return p;
+}
+
+var turn=0, playing=false, timer=null;
+
+function render(){
+  var T=TURNS[turn];
+  document.getElementById("tnum").textContent=turn+1;
+  document.getElementById("scrub").value=turn;
+  document.getElementById("userMsg").textContent=T.u;
+  document.getElementById("plantMark").innerHTML=(turn===PLANT)?'<span class="plant-mark">rule set here</span>':"";
+
+  var ra=document.getElementById("replyA"), rb=document.getElementById("replyB");
+  ra.textContent=T.a;
+  rb.textContent=T.b||T.a;
+  ra.className="reply plain"+(T.driftA?" broken":"");
+  if(T.driftA){
+    var fl=document.createElement("div");
+    fl.className="flag";
+    fl.textContent=T.driftA;
+    ra.appendChild(fl);
+  }
+  if(T.b){
+    var fo=document.createElement("div");
+    fo.className="flag ok";
+    fo.textContent="rule held";
+    rb.appendChild(fo);
+  }
+
+  renderLane("A",0,turn);
+  renderLane("B",1,turn);
+
+  document.getElementById("back").disabled=(turn===0);
+}
+
+function step(){
+  if(turn<TURNS.length-1){ turn++; render(); }
+  else{ stop(); }
+}
+function stop(){
+  playing=false;
+  clearInterval(timer);
+  document.getElementById("play").textContent="Play";
+}
+document.getElementById("play").addEventListener("click",function(){
+  if(playing){ stop(); return; }
+  if(turn>=TURNS.length-1){ turn=0; render(); }
+  playing=true;
+  this.textContent="Pause";
+  timer=setInterval(step,1500);
+});
+document.getElementById("back").addEventListener("click",function(){
+  stop(); if(turn>0){turn--;render();}
+});
+document.getElementById("reset").addEventListener("click",function(){
+  stop(); turn=0; render();
+});
+document.getElementById("scrub").addEventListener("input",function(){
+  stop(); turn=parseInt(this.value,10); render();
+});
+render();
+
+/* ---------------- panel D: the trap ---------------- */
+var pinSlider=document.getElementById("pinSize");
+function trap(){
+  var pin=parseInt(pinSlider.value,10);
+  var room=Math.max(0,CAP-SYS-pin);
+  var avgTurn=50;
+  var turns=Math.floor(room/avgTurn);
+  var spent=(SYS+pin)/CAP*100;
+
+  document.getElementById("pinRead").textContent=pin;
+  document.getElementById("tSys").style.width=(SYS/CAP*100)+"%";
+  document.getElementById("tPin").style.width=(pin/CAP*100)+"%";
+  document.getElementById("tFree").style.width=(room/CAP*100)+"%";
+  document.getElementById("statRoom").textContent=room;
+  document.getElementById("statTurns").textContent=turns;
+  document.getElementById("statPct").textContent=Math.round(spent)+"%";
+
+  var v=document.getElementById("verdict");
+  if(pin===0){
+    v.innerHTML="Nothing pinned. Maximum room to talk \u2014 and every rule is a message in the transcript, sliding toward the middle and eventually off the top. This is the plain lane from the demo.";
+  }else if(pin<=160){
+    v.innerHTML="A tight, deliberate block. Costs little, sits in the strongest position in the payload, survives every rebuild. This is what pinning is for.";
+  }else if(pin<=380){
+    v.innerHTML="Getting heavy. The rules still hold, but conversations now hit eviction noticeably sooner \u2014 you're trading turns for certainty. Worth it only if every pinned line genuinely has to be obeyed on every turn.";
+  }else{
+    v.innerHTML="<b>The trap.</b> Over a third of the window is gone before anyone types. Threads hit the ceiling fast, and the pinned block is now long enough to have a weak middle of its own. Pinning everything doesn't prevent drift \u2014 it relocates it.";
+  }
+}
+pinSlider.addEventListener("input",trap);
+trap();
+
+})();
+</script>
+</body>
+</html>
