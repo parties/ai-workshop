@@ -7,6 +7,7 @@ as-is.
 |---|---|---|
 | [`framework.md`](framework.md) | The four-part prompt framework — Verb, Format, Voice, Context. Full version with examples and rollout plan. | **Upload it** to your Project / Gem / Custom GPT. It's also worth reading yourself. |
 | [`sample-assignment.md`](sample-assignment.md) | A deliberately AI-vulnerable CTE assignment. | **Attach it** if you didn't bring one of your own. |
+| [`sample-assignment-revised.md`](sample-assignment-revised.md) | The revised, framework-ified assignment that integrates AI. | Use it as a reference for what an assignment that incorporates AI looks like.
 
 Prompts live in [`../prompts/`](../prompts/).
 
