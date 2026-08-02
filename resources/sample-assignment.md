@@ -1,6 +1,6 @@
 # Workplace Safety Write-Up
 
-**Introduction to [Your CTE Program] — 50 points**
+**Introduction to Auto Body Technology — 50 points**
 
 Write a one-page paper explaining why workplace safety matters in our industry.
 
