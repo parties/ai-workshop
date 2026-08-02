@@ -1,8 +1,6 @@
 # The Four-Part Prompt Framework
 
-**Upload this file to your Project, Gem, or Custom GPT.** It teaches the model what you're
-trying to do so it stops optimizing for a polished answer and starts optimizing for visible
-student thinking.
+A method for writing classroom prompts that make student thinking visible and assessable.
 
 *Framework by Tim Swick and Mark Davis, presented at CSTA 2026.*
 

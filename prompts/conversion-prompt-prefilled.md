@@ -6,13 +6,13 @@ I am going to give you an assignment I have used with students. Students complet
 
 Use this. Do not override it.
 
-- **Course and grade level:**
-- **Length of a class period, and realistic work time in it:**
-- **What my students can already do:**
-- **What my students genuinely cannot do yet:**
-- **The learning objective I actually care about here:**
-- **What I have to keep** (standards, required content, department rules)**:**
-- **What went wrong when students used AI on this:**
+- **Course and grade level:** Introduction to a CTE program, grades 9–10, mixed first-year students
+- **Length of a class period, and realistic work time in it:** 50 minutes, about 35 minutes of real work time after settling and cleanup
+- **What my students can already do:** read a procedure and follow it, identify obvious physical hazards when they are standing in the room, work in pairs
+- **What my students genuinely cannot do yet:** evaluate tradeoffs between competing priorities like speed and safety, write an argument with a counterpoint, read a dense regulatory document without support
+- **The learning objective I actually care about here:** students should be able to look at a real work situation and judge which hazard matters most *right now* and why — prioritizing under pressure, not reciting a list
+- **What I have to keep:** the three-hazard requirement is tied to our program's safety certification checklist, and it has to stay
+- **What went wrong when students used AI on this:** twenty-six of twenty-eight papers named the same three hazards in the same order, all generic to the industry rather than to our actual shop. Nobody mentioned the equipment we actually use. Every paper concluded that "safety is everyone's responsibility." I could not tell from any of them whether a student could spot a hazard standing in our room.
 
 ## What I want back
 

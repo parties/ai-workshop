@@ -11,12 +11,13 @@ Everything from the session is here. Nothing gated, no signup.
 
 1. Find an assignment your students **AI'd their way through** last year; save it as a file (txt, docx, pdf, md, html, doesn't matter)
 2. Open your AI of choice — new **Project** (Claude) / **Gem** (Gemini) / **Custom GPT** (ChatGPT)
-3. Upload **[`framework.md`](framework.md)** to your project/gem/custom GPT
-4. Paste the **[conversion prompt](conversion-prompt.md)** into the chat, attach your assignment
+3. Upload **[`resources/framework.md`](resources/framework.md)** to your project/gem/custom GPT
+4. Paste the **[conversion prompt](prompts/conversion-prompt.md)** into the chat, attach your assignment
 5. Read what comes back — then **push back on it**, *iterate*
 
-Didn't bring an assignment? Use **[`sample-assignment.md`](sample-assignment.md)** — it has a
-filled-in context block, so you can be running in about thirty seconds.
+Didn't bring an assignment? Use **[`resources/sample-assignment.md`](resources/sample-assignment.md)**
+plus the **[prefilled prompt](prompts/conversion-prompt-prefilled.md)** — context already
+written for you, zero edits, running in about thirty seconds.
 
 > **Upload your assignment, not your students' work.** If you want to show it what a kid
 > actually turned in, strip the name first. See [Student privacy](#student-privacy).
@@ -46,7 +47,7 @@ Same disease, two patients. You fix yours with a text file. You fix theirs with 
 conference profile and I haven't been able to find them online — **if you know them, please
 put us in touch.** I have a list of questions.*
 
-Full version, with examples and the rollout plan: **[`framework.md`](framework.md)**
+Full version, with examples and the rollout plan: **[`resources/framework.md`](resources/framework.md)**
 
 | Part | The question | Examples |
 |---|---|---|
