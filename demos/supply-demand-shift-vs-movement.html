@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Did the curve move, or did you move along it?</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --dem:#A33A28; --sup:#2F6F8F; --signal:#E5920C; --ok:#2E7D5B; --no:#A33A28;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 26px 32px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.45}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
+.sub{color:var(--ink-2);margin:0 0 16px;max-width:84ch}
+.wrap{display:grid;grid-template-columns:1fr minmax(330px,420px);gap:28px;align-items:start}
+@media (max-width:1000px){.wrap{grid-template-columns:1fr}}
+canvas{width:100%;aspect-ratio:9/7;display:block;background:var(--paper-2);
+  border:2px solid var(--rule);border-radius:12px}
+#banner{margin-top:12px;padding:14px 18px;border-radius:10px;font-size:26px;font-weight:800;
+  text-align:center;background:#fff;border:3px solid var(--rule);color:var(--ink-3);letter-spacing:-.3px}
+h2{font-size:17px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-2);margin:0 0 8px}
+.cards{display:grid;gap:8px;margin-bottom:18px}
+.card{text-align:left;font:inherit;font-size:19px;padding:12px 15px;border:2px solid var(--rule);
+  background:#fff;border-radius:10px;cursor:pointer}
+.card:hover{border-color:var(--ink-2)}
+.card.on{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.card small{display:block;font-size:16px;opacity:.75;margin-top:2px}
+.q{margin-bottom:14px}
+.q p{margin:0 0 6px;font-weight:700;font-size:19px}
+.opts{display:flex;gap:7px;flex-wrap:wrap}
+.opts button{font:inherit;font-size:18px;font-weight:700;padding:9px 15px;border:2px solid var(--ink-2);
+  background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
+.opts button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.opts button.right{background:#E2F1EA;border-color:var(--ok);color:var(--ok)}
+.opts button.wrong{background:#F7E4E1;border-color:var(--no);color:var(--no)}
+#check{width:100%;font:inherit;font-size:21px;font-weight:800;padding:13px;margin-bottom:14px;
+  border:2px solid var(--signal);background:#FDF3E0;border-radius:10px;cursor:pointer}
+#check:disabled{opacity:.45;cursor:default}
+#explain{padding:14px 17px;border-left:6px solid var(--signal);background:var(--paper-2);
+  font-size:18px;color:var(--ink-2);display:none}
+#explain.show{display:block}
+.hide{display:none}
+b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<h1>Did the curve move, or did you just move along it?</h1>
+<p class="sub">The textbook prints the finished picture with D and D&prime; both already drawn, so there is no
+before and after &mdash; and cause-versus-effect <em>is</em> the order. <b>Pick a shock, predict, then watch it happen.</b></p>
+
+<div class="wrap">
+  <div>
+    <canvas id="cv" width="900" height="700"></canvas>
+    <div id="banner">Pick a shock to begin</div>
+  </div>
+
+  <div>
+    <h2>1. Something happens</h2>
+    <div class="cards" id="cards"></div>
+
+    <div id="quiz" class="hide">
+      <h2>2. Predict, before you look</h2>
+      <div class="q">
+        <p>Which curve moves?</p>
+        <div class="opts" id="qCurve">
+          <button data-v="D">Demand</button>
+          <button data-v="S">Supply</button>
+          <button data-v="N">Neither</button>
+        </div>
+      </div>
+      <div class="q">
+        <p>What happens to the quantity traded?</p>
+        <div class="opts" id="qQty">
+          <button data-v="up">Goes up</button>
+          <button data-v="down">Goes down</button>
+        </div>
+      </div>
+      <button id="check" disabled>Check my prediction</button>
+    </div>
+
+    <div id="explain"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var BASE={dA:90, dB:0.7, sA:15, sB:0.6};
+  var SHOCKS=[
+    {t:'Gas prices spike', m:'market: large SUVs', kind:'shift', curve:'D', to:-28, qty:'down',
+     x:'Gas is a complement to a big truck, so at <b>every single price</b> fewer people want one. '+
+       'That is a brand new willingness-to-pay at every price — the whole demand curve moves left. '+
+       'Watch the equilibrium point: it slid <b>down along the supply curve</b>. Supply never moved. '+
+       'Sellers did not change their minds; they just met a smaller crowd.'},
+    {t:'A second coffee shop opens downtown', m:'market: a cup of coffee', kind:'shift', curve:'S', to:-22, qty:'up',
+     x:'More sellers means more cups offered at <b>every price</b>, so supply moves right. '+
+       'Price falls and quantity rises — and the equilibrium slid <b>down along the demand curve</b>. '+
+       'Buyers did nothing. Demand is exactly the curve it always was.'},
+    {t:'The minimum wage rises', m:'market: fast-food meals', kind:'shift', curve:'S', to:26, qty:'down',
+     x:'Labour is an input, so producing each meal now costs more and sellers offer fewer at '+
+       '<b>every price</b>: supply moves left. Price up, quantity down. The equilibrium slid '+
+       '<b>up along the demand curve</b> — which is exactly why fewer meals get sold even though '+
+       'nobody’s appetite changed.'},
+    {t:'The dealership runs a sale', m:'market: large SUVs', kind:'move', priceTo:30, qty:'up',
+     x:'<b>Nothing moved.</b> A price change is not a demand change. Buyers’ willingness to pay at every '+
+       'price is the identical curve it was a second ago — you simply slid to a different <b>point on it</b>. '+
+       'This is a change in <b>quantity demanded</b>, not a change in demand. '+
+       'If your answer was “demand moves”, this is the exact place the test question lives.'}
+  ];
+
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d'), W,H;
+  var M={l:70,r:26,t:26,b:62};
+  var st={dA:BASE.dA, sA:BASE.sA, price:null}, trail=[], sel=-1, pick={curve:null,qty:null}, revealed=false;
+
+  function resize(){
+    var r=cv.getBoundingClientRect(), d=window.devicePixelRatio||1;
+    cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+    ctx.setTransform(d,0,0,d,0,0); W=r.width; H=r.height; draw();
+  }
+  function px(q){return M.l+q/100*(W-M.l-M.r);}
+  function py(p){return H-M.b-p/100*(H-M.t-M.b);}
+  function dem(q,A){return (A===undefined?st.dA:A)-BASE.dB*q;}
+  function sup(q,A){return (A===undefined?st.sA:A)+BASE.sB*q;}
+  function eq(){var q=(st.dA-st.sA)/(BASE.dB+BASE.sB); return {q:q,p:dem(q)};}
+
+  function line(fn,color,width,dash,label){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(M.l,M.t,W-M.l-M.r,H-M.t-M.b); ctx.clip();
+    ctx.beginPath(); ctx.setLineDash(dash||[]); ctx.strokeStyle=color; ctx.lineWidth=width;
+    ctx.moveTo(px(0),py(fn(0))); ctx.lineTo(px(100),py(fn(100))); ctx.stroke();
+    if(label){
+      ctx.setLineDash([]); ctx.fillStyle=color; ctx.font='800 24px ui-sans-serif,system-ui,sans-serif';
+      ctx.textAlign='left'; ctx.fillText(label, px(88)+8, py(fn(88)));
+    }
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    ctx.strokeStyle='#D6DEE5'; ctx.lineWidth=1;
+    for(var i=0;i<=10;i++){
+      ctx.beginPath(); ctx.moveTo(px(i*10),M.t); ctx.lineTo(px(i*10),H-M.b); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(M.l,py(i*10)); ctx.lineTo(W-M.r,py(i*10)); ctx.stroke();
+    }
+    ctx.strokeStyle='#3A4A5A'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(M.l,M.t); ctx.lineTo(M.l,H-M.b); ctx.lineTo(W-M.r,H-M.b); ctx.stroke();
+    ctx.fillStyle='#3A4A5A'; ctx.font='800 21px ui-sans-serif,system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('QUANTITY', (M.l+W-M.r)/2, H-18);
+    ctx.save(); ctx.translate(22,(M.t+H-M.b)/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('PRICE',0,0); ctx.restore();
+    ctx.restore();
+
+    if(sel>=0 && SHOCKS[sel].kind==='shift'){
+      var s=SHOCKS[sel];
+      if(s.curve==='D') line(function(q){return dem(q,BASE.dA);},'#D8B2AA',4,[9,8]);
+      else line(function(q){return sup(q,BASE.sA);},'#A9C6D4',4,[9,8]);
+    }
+
+    line(function(q){return dem(q);},'#A33A28',6,null,'D');
+    line(function(q){return sup(q);},'#2F6F8F',6,null,'S');
+
+    if(trail.length>1){
+      ctx.save(); ctx.beginPath(); ctx.strokeStyle='#E5920C'; ctx.lineWidth=9;
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.moveTo(px(trail[0].q),py(trail[0].p));
+      for(var t=1;t<trail.length;t++) ctx.lineTo(px(trail[t].q),py(trail[t].p));
+      ctx.stroke(); ctx.restore();
+    }
+
+    var e=eq(), q,p;
+    if(st.price!==null){ p=st.price; q=(st.dA-p)/BASE.dB; } else { q=e.q; p=e.p; }
+    ctx.save();
+    ctx.setLineDash([7,7]); ctx.strokeStyle='#6B7C8C'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(M.l,py(p)); ctx.lineTo(px(q),py(p));
+    ctx.lineTo(px(q),H-M.b); ctx.stroke();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(px(q),py(p),13,0,6.284);
+    ctx.fillStyle='#16202B'; ctx.fill(); ctx.lineWidth=4; ctx.strokeStyle='#F3F6F8'; ctx.stroke();
+  }
+
+  var banner=document.getElementById('banner');
+  function setBanner(txt,col){ banner.textContent=txt; banner.style.color=col; banner.style.borderColor=col; }
+
+  function reset(){
+    st.dA=BASE.dA; st.sA=BASE.sA; st.price=null; trail=[]; revealed=false;
+    pick.curve=null; pick.qty=null;
+    Array.prototype.forEach.call(document.querySelectorAll('.opts button'),function(b){
+      b.className=''; });
+    document.getElementById('check').disabled=true;
+    document.getElementById('explain').classList.remove('show');
+    setBanner('Predict first, then check','#6B7C8C');
+    draw();
+  }
+
+  var cardsEl=document.getElementById('cards');
+  SHOCKS.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='card'; b.innerHTML=s.t+'<small>'+s.m+'</small>';
+    b.addEventListener('click',function(){
+      sel=i;
+      Array.prototype.forEach.call(cardsEl.children,function(c,j){c.classList.toggle('on',j===i);});
+      document.getElementById('quiz').classList.remove('hide');
+      reset();
+    });
+    cardsEl.appendChild(b);
+  });
+
+  function wire(id,key){
+    document.getElementById(id).addEventListener('click',function(ev){
+      if(revealed || ev.target.tagName!=='BUTTON') return;
+      pick[key]=ev.target.dataset.v;
+      Array.prototype.forEach.call(this.children,function(b){ b.classList.toggle('on', b===ev.target); });
+      document.getElementById('check').disabled = !(pick.curve && pick.qty);
+    });
+  }
+  wire('qCurve','curve'); wire('qQty','qty');
+
+  function animate(from,to,apply,after){
+    var t0=null, DUR=1100;
+    function step(ts){
+      if(t0===null) t0=ts;
+      var u=Math.min(1,(ts-t0)/DUR), e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+      apply(from+(to-from)*e);
+      var q,p;
+      if(st.price!==null){ p=st.price; q=(st.dA-p)/BASE.dB; } else { var E=eq(); q=E.q; p=E.p; }
+      trail.push({q:q,p:p});
+      draw();
+      if(u<1) requestAnimationFrame(step); else after();
+    }
+    requestAnimationFrame(step);
+  }
+
+  document.getElementById('check').addEventListener('click',function(){
+    if(revealed) return;
+    revealed=true; this.disabled=true;
+    var s=SHOCKS[sel];
+    var rightCurve = s.kind==='move' ? 'N' : s.curve;
+    mark('qCurve', rightCurve); mark('qQty', s.qty);
+
+    var done=function(){
+      var isShift = s.kind==='shift';
+      setBanner(isShift?'SHIFT — a whole new curve':'MOVEMENT — same curve, different point',
+                isShift?'#A33A28':'#2E7D5B');
+      var ex=document.getElementById('explain');
+      var scoreCurve = pick.curve===rightCurve, scoreQty = pick.qty===s.qty;
+      ex.innerHTML='<b>'+(scoreCurve&&scoreQty?'Both right.':scoreCurve||scoreQty?'One right, one not.':'Both wrong — good, this is the useful kind of wrong.')+'</b><br>'+s.x;
+      ex.classList.add('show');
+    };
+
+    if(s.kind==='move'){
+      setBanner('watching…','#6B7C8C');
+      st.price=eq().p;
+      animate(st.price, s.priceTo, function(v){ st.price=v; }, done);
+    } else if(s.curve==='D'){
+      animate(BASE.dA, BASE.dA+s.to, function(v){ st.dA=v; }, done);
+    } else {
+      animate(BASE.sA, BASE.sA+s.to, function(v){ st.sA=v; }, done);
+    }
+  });
+
+  function mark(id,correct){
+    Array.prototype.forEach.call(document.getElementById(id).children,function(b){
+      b.classList.remove('on');
+      if(b.dataset.v===correct) b.classList.add('right');
+      else if(b.dataset.v===pick[id==='qCurve'?'curve':'qty']) b.classList.add('wrong');
+    });
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+})();
+</script>
+</body>
+</html>

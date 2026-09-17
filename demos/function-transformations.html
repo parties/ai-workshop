@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why does f(x + 3) move the graph LEFT?</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --parent:#8A97A3; --child:#2F6F8F; --signal:#E5920C; --hot:#A33A28;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 26px 32px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.45}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
+.sub{color:var(--ink-2);margin:0 0 16px;max-width:82ch}
+.wrap{display:grid;grid-template-columns:1fr minmax(320px,400px);gap:28px;align-items:start}
+@media (max-width:980px){.wrap{grid-template-columns:1fr}}
+canvas{width:100%;aspect-ratio:8/6;display:block;background:var(--paper-2);
+  border:2px solid var(--rule);border-radius:12px;touch-action:none;cursor:crosshair}
+.eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:34px;
+  font-weight:700;text-align:center;padding:12px;background:#fff;border:2px solid var(--rule);
+  border-radius:10px;margin-bottom:14px;color:var(--child);letter-spacing:-.5px}
+.chain{background:#fff;border:2px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.chain div{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;
+  border-bottom:1px solid var(--rule);font-size:18px}
+.chain div:last-child{border-bottom:0}
+.chain .lbl{color:var(--ink-2)}
+.chain .val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;white-space:nowrap}
+.chain .hi{background:#FDF3E0}
+.chain .hi .val{color:var(--hot)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button{font:inherit;font-size:18px;font-weight:700;padding:9px 16px;border:2px solid var(--ink-2);
+  background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
+button:hover{background:var(--paper-2)}
+button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#why{border-color:var(--signal);background:#FDF3E0;width:100%;margin-bottom:14px;font-size:20px}
+.ctl{margin-bottom:10px}
+.ctl label{display:flex;justify-content:space-between;font-size:17px;font-weight:700;
+  color:var(--ink-2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+.ctl label span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);font-size:18px}
+input[type=range]{width:100%;height:34px;accent-color:var(--child);cursor:pointer}
+.key{display:flex;gap:18px;font-size:17px;color:var(--ink-2);margin:8px 0 0}
+.key i{display:inline-block;width:26px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.note{margin-top:14px;padding:13px 16px;border-left:6px solid var(--signal);
+  background:var(--paper-2);font-size:18px;color:var(--ink-2)}
+b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<h1>The <code>+3</code> is inside. So it happens <em>before</em> the function does.</h1>
+<p class="sub">Students read <code>f(x + 3)</code> and expect the graph to move right, because plus means right
+everywhere else. <b>Drag the orange dot along the x-axis</b> and watch where the input actually gets sent.</p>
+
+<div class="wrap">
+  <div>
+    <canvas id="cv" width="960" height="720"></canvas>
+    <div class="key">
+      <span><i style="background:#8A97A3"></i>parent f(x)</span>
+      <span><i style="background:#2F6F8F"></i>transformed</span>
+      <span><i style="background:#E5920C"></i>your input x</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="eq" id="eq">f(x)</div>
+
+    <div class="chain">
+      <div><span class="lbl">You feed in</span><span class="val" id="c1">x = 0</span></div>
+      <div class="hi"><span class="lbl">Inside computes</span><span class="val" id="c2">0</span></div>
+      <div><span class="lbl">Parent is read there</span><span class="val" id="c3">f(0) = 0</span></div>
+      <div><span class="lbl">Outside finishes</span><span class="val" id="c4">= 0</span></div>
+    </div>
+
+    <button id="why">Show me why +3 goes left &rarr;</button>
+
+    <div class="row">
+      <button class="par on" data-p="sq">f(x) = x&sup2;</button>
+      <button class="par" data-p="abs">f(x) = |x|</button>
+      <button class="par" data-p="sin">f(x) = sin x</button>
+    </div>
+
+    <div class="ctl"><label for="h">h &mdash; horizontal <span id="hv">0</span></label>
+      <input type="range" id="h" min="-5" max="5" step="0.5" value="0"></div>
+    <div class="ctl"><label for="k">k &mdash; vertical <span id="kv">0</span></label>
+      <input type="range" id="k" min="-5" max="5" step="0.5" value="0"></div>
+    <div class="ctl"><label for="a">a &mdash; vertical stretch <span id="av">1</span></label>
+      <input type="range" id="a" min="-3" max="3" step="0.5" value="1"></div>
+    <div class="ctl"><label for="b">b &mdash; horizontal stretch <span id="bv">1</span></label>
+      <input type="range" id="b" min="-3" max="3" step="0.5" value="1"></div>
+    <div class="ctl"><label for="x0">x &mdash; the input you are tracing <span id="xv">0</span></label>
+      <input type="range" id="x0" min="-8" max="8" step="0.1" value="0"></div>
+
+    <div class="note" id="note">Move <b>h</b> and watch the orange arrow. The graph never moves the input &mdash;
+    the inside of the parentheses <b>redirects</b> it, and it redirects the opposite way.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var XMIN=-8,XMAX=8,YMIN=-6,YMAX=6;
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var P={sq:function(x){return x*x;}, abs:function(x){return Math.abs(x);}, sin:function(x){return Math.sin(x);}};
+  var PN={sq:'x²', abs:'|x|', sin:'sin x'};
+  var st={p:'sq', a:1, b:1, h:0, k:0, x0:0};
+  var W,H;
+
+  function resize(){
+    var r=cv.getBoundingClientRect(), d=window.devicePixelRatio||1;
+    cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d);
+    ctx.setTransform(d,0,0,d,0,0); W=r.width; H=r.height; draw();
+  }
+  function px(x){return (x-XMIN)/(XMAX-XMIN)*W;}
+  function py(y){return H-(y-YMIN)/(YMAX-YMIN)*H;}
+  function ux(p){return XMIN+p/W*(XMAX-XMIN);}
+  function f(x){return P[st.p](x);}
+  function g(x){return st.a*f(st.b*(x-st.h))+st.k;}
+
+  function curve(fn,color,width,dash){
+    ctx.save(); ctx.beginPath(); ctx.setLineDash(dash||[]);
+    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineJoin='round';
+    for(var p=0;p<=W;p+=1.5){
+      var y=fn(ux(p));
+      if(!isFinite(y)){ ctx.stroke(); ctx.beginPath(); continue; }
+      var Y=py(y);
+      if(Y<-4000) Y=-4000; if(Y>4000) Y=4000;
+      if(p===0) ctx.moveTo(p,Y); else ctx.lineTo(p,Y);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+  function dot(x,y,color,r){
+    ctx.beginPath(); ctx.arc(px(x),py(y),r||9,0,6.284);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.lineWidth=3; ctx.strokeStyle='#F3F6F8'; ctx.stroke();
+  }
+  function seg(x1,y1,x2,y2,color,dash){
+    ctx.save(); ctx.beginPath(); ctx.setLineDash(dash||[8,7]);
+    ctx.strokeStyle=color; ctx.lineWidth=3.5;
+    ctx.moveTo(px(x1),py(y1)); ctx.lineTo(px(x2),py(y2)); ctx.stroke(); ctx.restore();
+  }
+  function arrowAxis(x1,x2,color){
+    if(Math.abs(x2-x1)<0.06) return;
+    var y=py(0)+34, a=px(x1), b=px(x2), dir=b>a?1:-1;
+    ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=5;
+    ctx.beginPath(); ctx.moveTo(a,y); ctx.lineTo(b-dir*11,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(b,y); ctx.lineTo(b-dir*15,y-9); ctx.lineTo(b-dir*15,y+9);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    ctx.strokeStyle='#D6DEE5'; ctx.lineWidth=1;
+    for(var x=XMIN;x<=XMAX;x++){ ctx.beginPath(); ctx.moveTo(px(x),0); ctx.lineTo(px(x),H); ctx.stroke(); }
+    for(var y=YMIN;y<=YMAX;y++){ ctx.beginPath(); ctx.moveTo(0,py(y)); ctx.lineTo(W,py(y)); ctx.stroke(); }
+    ctx.strokeStyle='#6B7C8C'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(0,py(0)); ctx.lineTo(W,py(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px(0),0); ctx.lineTo(px(0),H); ctx.stroke();
+    ctx.fillStyle='#6B7C8C'; ctx.font='600 15px ui-sans-serif,system-ui,sans-serif'; ctx.textAlign='center';
+    for(var x=XMIN+1;x<XMAX;x+=2){ if(x) ctx.fillText(x,px(x),py(0)+19); }
+    ctx.restore();
+
+    curve(f,'#8A97A3',4,[10,8]);
+    curve(g,'#2F6F8F',6);
+
+    var x0=st.x0, u=st.b*(x0-st.h), fv=f(u), gy=st.a*fv+st.k;
+    arrowAxis(x0,u,'#E5920C');
+    if(isFinite(fv)){
+      seg(u,0,u,fv,'#8A97A3');
+      dot(u,fv,'#8A97A3',10);
+      seg(u,fv,x0,fv,'#8A97A3');
+      if(Math.abs(gy-fv)>0.02) seg(x0,fv,x0,gy,'#2F6F8F');
+      dot(x0,gy,'#2F6F8F',12);
+    }
+    dot(x0,0,'#E5920C',11);
+
+    ctx.save(); ctx.fillStyle='#E5920C'; ctx.font='700 19px ui-sans-serif,system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('x = '+fmt(x0), px(x0), py(0)+72);
+    if(Math.abs(u-x0)>0.06){
+      ctx.fillStyle='#3A4A5A'; ctx.fillText('reads f at '+fmt(u), px(u), py(0)+72);
+    }
+    ctx.restore();
+  }
+
+  function fmt(n){ n=Math.round(n*100)/100; return (n===0?0:n).toString(); }
+  function inner(){
+    var xh='x'+(st.h>0?' − '+fmt(st.h):st.h<0?' + '+fmt(-st.h):'');
+    return st.b===1?xh:(st.b===-1?'−(':fmt(st.b)+'(')+xh+')';
+  }
+  function eqText(){
+    var pre=st.a===1?'':st.a===-1?'−':fmt(st.a);
+    var post=st.k>0?' + '+fmt(st.k):st.k<0?' − '+fmt(-st.k):'';
+    return pre+'f('+inner()+')'+post;
+  }
+
+  function sync(){
+    document.getElementById('eq').textContent=eqText();
+    var x0=st.x0, u=st.b*(x0-st.h), fv=f(u), gy=st.a*fv+st.k;
+    document.getElementById('c1').textContent='x = '+fmt(x0);
+    document.getElementById('c2').textContent=inner().replace(/x/g,'('+fmt(x0)+')')+' = '+fmt(u);
+    document.getElementById('c3').textContent='f('+fmt(u)+') = '+fmt(fv)+'   [parent '+PN[st.p]+']';
+    document.getElementById('c4').textContent='= '+fmt(gy);
+    document.getElementById('hv').textContent=fmt(st.h);
+    document.getElementById('kv').textContent=fmt(st.k);
+    document.getElementById('av').textContent=fmt(st.a);
+    document.getElementById('bv').textContent=fmt(st.b);
+    document.getElementById('xv').textContent=fmt(st.x0);
+    draw();
+  }
+
+  ['a','b','h','k'].forEach(function(id){
+    var el=document.getElementById(id);
+    el.addEventListener('input',function(){ st[id]=parseFloat(el.value); sync(); });
+  });
+  var xEl=document.getElementById('x0');
+  xEl.addEventListener('input',function(){ st.x0=parseFloat(xEl.value); sync(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.par'),function(btn){
+    btn.addEventListener('click',function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.par'),function(o){o.classList.remove('on');});
+      btn.classList.add('on'); st.p=btn.dataset.p; sync();
+    });
+  });
+
+  document.getElementById('why').addEventListener('click',function(){
+    st.p='sq'; st.a=1; st.b=1; st.h=-3; st.k=0; st.x0=-3;
+    document.getElementById('a').value=1; document.getElementById('b').value=1;
+    document.getElementById('h').value=-3; document.getElementById('k').value=0;
+    xEl.value=-3;
+    Array.prototype.forEach.call(document.querySelectorAll('.par'),function(o){
+      o.classList.toggle('on', o.dataset.p==='sq'); });
+    document.getElementById('note').innerHTML='Stand at <b>x = −3</b>. The inside computes '+
+      '<b>(−3) + 3 = 0</b>, so the parent gets read at <b>0</b> — and the parent’s value at 0 is its '+
+      'lowest point. The vertex now sits at −3. <b>The graph moved left because the input got sent right.</b>';
+    sync();
+  });
+
+  var dragging=false;
+  function setFromEvent(ev){
+    var r=cv.getBoundingClientRect();
+    var x=Math.max(XMIN,Math.min(XMAX, ux(ev.clientX-r.left)));
+    st.x0=Math.round(x*10)/10; xEl.value=st.x0; sync();
+  }
+  cv.addEventListener('pointerdown',function(ev){ dragging=true; cv.setPointerCapture(ev.pointerId); setFromEvent(ev); });
+  cv.addEventListener('pointermove',function(ev){ if(dragging) setFromEvent(ev); });
+  cv.addEventListener('pointerup',function(){ dragging=false; });
+  cv.addEventListener('pointercancel',function(){ dragging=false; });
+
+  window.addEventListener('resize',resize);
+  resize(); sync();
+})();
+</script>
+</body>
+</html>

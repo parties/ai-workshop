@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ser vs. estar — the rule they were taught is the misconception</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --ser:#2F6F8F; --estar:#A33A28; --signal:#E5920C; --no:#A33A28; --ok:#2E7D5B;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 26px 34px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.45}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
+.sub{color:var(--ink-2);margin:0 0 18px;max-width:84ch}
+.frame{background:#fff;border:2px solid var(--rule);border-radius:14px;padding:26px 28px;margin-bottom:16px}
+#sent{font-size:46px;font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:6px}
+#sent .v{padding:2px 12px;border-radius:8px;color:#fff}
+#sent.bad{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:3px}
+#gloss{font-size:30px;color:var(--ink-2);font-weight:600;margin-top:10px;min-height:1.2em}
+.toggle{display:flex;gap:12px;margin:0 0 16px}
+.toggle button{flex:1;font:inherit;font-size:26px;font-weight:800;padding:16px 10px;
+  border:3px solid var(--rule);background:#fff;color:var(--ink-3);border-radius:12px;cursor:pointer;
+  letter-spacing:-.4px}
+.toggle button small{display:block;font-size:17px;font-weight:600;letter-spacing:0;opacity:.85}
+#bSer.on{border-color:var(--ser);background:var(--ser);color:#fff}
+#bEstar.on{border-color:var(--estar);background:var(--estar);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{border:2px solid var(--rule);border-radius:12px;padding:16px 19px;background:#fff}
+.panel h3{margin:0 0 7px;font-size:16px;text-transform:uppercase;letter-spacing:.9px;color:var(--ink-3)}
+.panel p{margin:0;font-size:19px;color:var(--ink-2)}
+#cmpPanel{border-color:var(--estar);background:#FBF0EE}
+#cmpPanel h3{color:var(--estar)}
+#cmpPanel.off{display:none}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.bar button{font:inherit;font-size:18px;font-weight:700;padding:11px 17px;border:2px solid var(--ink-2);
+  background:#fff;color:var(--ink);border-radius:9px;cursor:pointer}
+.bar button:hover{background:var(--paper-2)}
+#test{border-color:var(--signal);background:#FDF3E0;font-size:19px}
+#count{color:var(--ink-3);font-size:18px;margin-left:auto}
+#verdict{display:none;margin-top:14px;border:3px solid var(--signal);border-radius:12px;
+  padding:17px 20px;background:#FDF3E0}
+#verdict.show{display:block}
+#vTag{font-size:27px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+#vTxt{font-size:19px;color:var(--ink-2)}
+.law{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:900px){.law{grid-template-columns:1fr}}
+.law div{padding:14px 18px;border-left:7px solid;background:var(--paper-2);font-size:19px}
+.law .s{border-color:var(--ser)} .law .e{border-color:var(--estar)}
+.law b{font-size:22px;display:block;margin-bottom:2px}
+b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<h1>The rule they were taught <em>is</em> the misconception.</h1>
+<p class="sub">&ldquo;Ser is permanent, estar is temporary.&rdquo; It is wrong often enough that students who obey it
+get marked down. <b>Flip the verb</b> and watch the English change &mdash; then press the test button and watch the rule fail.</p>
+
+<div class="frame">
+  <div id="sent"></div>
+  <div id="gloss"></div>
+</div>
+
+<div class="toggle">
+  <button id="bSer">SER<small id="sSer">es</small></button>
+  <button id="bEstar">ESTAR<small id="sEstar">est&aacute;</small></button>
+</div>
+
+<div class="grid">
+  <div class="panel"><h3>What this sentence actually claims</h3><p id="mean"></p></div>
+  <div class="panel off" id="cmpPanel"><h3>Compared to what?</h3><p id="cmp"></p></div>
+</div>
+
+<div class="bar">
+  <button id="prev">&larr; Previous</button>
+  <button id="next">Next pair &rarr;</button>
+  <button id="test">Run the &ldquo;permanent / temporary&rdquo; rule on this</button>
+  <span id="count"></span>
+</div>
+
+<div id="verdict"><div id="vTag"></div><div id="vTxt"></div></div>
+
+<div class="law">
+  <div class="s"><b>SER &mdash; what it <em>is</em></b>Which category the thing belongs to. Its defining description.</div>
+  <div class="e"><b>ESTAR &mdash; how it <em>compares</em></b>How it stands right now against a norm, an expectation, or how it was before.</div>
+</div>
+
+<script>
+(function(){
+  var PAIRS=[
+    {subj:'Ana', adj:'aburrida',
+     ser:{v:'es', en:'Ana is boring.', mean:'A claim about what kind of person Ana is. Put her in the category of boring people.'},
+     estar:{v:'está', en:'Ana is bored.', mean:'Ana has departed from her usual state. Something is going on with her right now.',
+            cmp:'Compared to how Ana normally is when she is engaged.'},
+     tag:'RIGHT ANSWER, WRONG REASON', ok:'warn',
+     why:'The rule happens to pick correctly here, which is exactly why it survives. But notice: <b>Ana es aburrida</b> can be true for one bad summer, and <b>Ana está aburrida</b> can last her whole sophomore year. Duration was never the variable. The rule is right by accident and it teaches the wrong mechanism.'},
+
+    {subj:'Mi abuelo', adj:'muerto',
+     ser:{bad:true, v:'es', en:'Spanish speakers do not say this.',
+          mean:'There is no reading of this sentence. It is simply not said, however permanent the condition is.'},
+     estar:{v:'está', en:'My grandfather is dead.', mean:'A state he arrived in. Spanish treats death as a condition he is in, not a category he belongs to.',
+            cmp:'Compared to being alive — the state he was in before.'},
+     tag:'THE RULE BREAKS', ok:'fail',
+     why:'Death is the most permanent condition that exists. The rule predicts <b>ser</b>. Spanish uses <b>estar</b>, and <em>only</em> estar. This is not an exception to be memorised at the edge &mdash; it is the rule failing at its own strongest case.'},
+
+    {subj:'La manzana', adj:'verde',
+     ser:{v:'es', en:'The apple is green.', mean:'Green is what kind of apple it is — a Granny Smith. The variety.'},
+     estar:{v:'está', en:'The apple is unripe.', mean:'It is not ready yet. Green here is a stage, not a colour.',
+            cmp:'Compared to the ripe apple it is going to become.'},
+     tag:'THE RULE IS BLIND HERE', ok:'fail',
+     why:'Both sentences describe a colour that will not change today. The rule has no way to tell them apart, so it gives the student nothing &mdash; while the actual difference (variety versus ripeness) is enormous and is the whole point of the sentence.'},
+
+    {subj:'Juan', adj:'listo',
+     ser:{v:'es', en:'Juan is clever.', mean:'A trait. This is the kind of mind Juan has.'},
+     estar:{v:'está', en:'Juan is ready.', mean:'Prepared, right now, for the specific thing about to happen.',
+            cmp:'Compared to a minute ago, when he was not ready.'},
+     tag:'THE RULE WORKS', ok:'pass',
+     why:'Clever is durable, ready is momentary, and the rule lands cleanly. <b>This is why the rule is still taught.</b> It works often enough to feel reliable, which is precisely what makes a student confident and wrong on the next card.'},
+
+    {subj:'La fiesta', adj:'en mi casa',
+     ser:{v:'es', en:'The party is at my house.', mean:'Correct, and it is ser. An event does not sit in a place — it happens in a place, and Spanish marks that with ser.'},
+     estar:{bad:true, v:'está', en:'Spanish speakers do not say this.',
+            mean:'Wrong verb for an event. Estar would be right for my house — Mi casa está en la calle Mayor — but not for the party happening in it.'},
+     tag:'THE RULE BREAKS', ok:'fail',
+     why:'The back-up rule everyone reaches for is &ldquo;location is always estar.&rdquo; A party&rsquo;s location lasts four hours &mdash; about as temporary as anything gets &mdash; and Spanish still demands <b>ser</b>. Events take ser for where they happen. Objects take estar for where they sit.'},
+
+    {subj:'Pedro', adj:'vivo',
+     ser:{v:'es', en:'Pedro is sharp.', mean:'Quick, streetwise, hard to fool. A character trait.'},
+     estar:{v:'está', en:'Pedro is alive.', mean:'A state Pedro is in — the one that ends.',
+            cmp:'Compared to the alternative.'},
+     tag:'THE RULE BREAKS', ok:'fail',
+     why:'Put this next to <b>está muerto</b>. Alive takes estar. Dead takes estar. The permanent/temporary rule has now failed at both ends of a human life, while <b>ser</b> quietly handles a personality trait that could change next year.'},
+
+    {subj:'La sopa', adj:'rica',
+     ser:{v:'es', en:'Soup is delicious.', mean:'A claim about soup as a category of food — the kind of thing soup is.'},
+     estar:{v:'está', en:'This soup tastes great.', mean:'This bowl, right now, measured against what you were expecting when you picked up the spoon.',
+            cmp:'Compared to what you expected this particular soup to taste like.'},
+     tag:'THE RULE IS BLIND HERE', ok:'fail',
+     why:'Nothing in either sentence is about how long anything lasts. The rule has no opinion at all, because duration is not the variable being expressed. What is being expressed is <b>category versus comparison</b>.'},
+
+    {subj:'Marta', adj:'guapa',
+     ser:{v:'es', en:'Marta is good-looking.', mean:'A description of Marta in general. What she looks like, full stop.'},
+     estar:{v:'está', en:'Marta looks great tonight.', mean:'A change from her baseline that the speaker noticed and is commenting on.',
+            cmp:'Compared to how Marta normally looks.'},
+     tag:'THE RULE IS BLIND HERE', ok:'fail',
+     why:'Both are about appearance and either could last an evening or a decade. What separates them is whether you are describing Marta or <b>reacting to a difference</b> in Marta. The rule cannot see that distinction, so students overuse estar and accidentally imply their friend usually looks bad.'},
+
+    {subj:'El café', adj:'frío',
+     ser:{v:'es', en:'Coffee is a cold drink.', mean:'Claiming cold is a defining property of coffee. This sounds wrong unless you really mean iced coffee as a category.'},
+     estar:{v:'está', en:'The coffee has gone cold.', mean:'It has left the temperature coffee is supposed to arrive at.',
+            cmp:'Compared to hot — the temperature this cup was supposed to be.'},
+     tag:'THE RULE IS BLIND HERE', ok:'fail',
+     why:'A forgotten cup of coffee stays cold forever. Permanence is not the question. The question is whether cold is <b>what it is</b> or <b>what it has become</b>, and only the second one is a comparison.'},
+
+    {subj:'Carlos', adj:'malo',
+     ser:{v:'es', en:'Carlos is a bad person.', mean:'A moral claim about who Carlos is.'},
+     estar:{v:'está', en:'Carlos is sick.', mean:'Carlos has changed for the worse. Across most of the Spanish-speaking world this means ill.',
+            cmp:'Compared to being well.'},
+     tag:'RIGHT ANSWER, WRONG REASON', ok:'warn',
+     why:'Illness is temporary, badness is durable, so the rule picks the right verb. But it gave the student no warning that <b>malo</b> means <em>sick</em> under estar. The rule tells you which verb to reach for and never tells you what the sentence will mean once you do.'},
+
+    {subj:'Ella', adj:'callada',
+     ser:{v:'es', en:'She is a quiet person.', mean:'How much she talks, generally. A trait.'},
+     estar:{v:'está', en:'She has gone quiet.', mean:'The silence is noticeable, and it is noticeable because it is not like her.',
+            cmp:'Compared to how much she normally talks.'},
+     tag:'RIGHT ANSWER, WRONG REASON', ok:'warn',
+     why:'The estar sentence is not about the silence being brief. It is about the silence being <b>a departure</b>. That is why it carries an implication &mdash; something is wrong &mdash; that the temporary framing completely loses.'},
+
+    {subj:'La puerta', adj:'cerrada',
+     ser:{bad:true, v:'es', en:'Not how this is said.',
+          mean:'This reads as a strange passive, not as a description of the door. To say the door is shut, Spanish uses estar.'},
+     estar:{v:'está', en:'The door is closed.', mean:'A result. Something closed it, and it is now in that condition.',
+            cmp:'Compared to open — the state it was in before someone closed it.'},
+     tag:'THE RULE BREAKS', ok:'fail',
+     why:'A closed door can stay closed for a century and it is still <b>estar</b>. Closed is a <b>result of a change</b>, not a category of door. Results take estar no matter how long they last &mdash; which is the same reason <b>muerto</b> takes estar.'}
+  ];
+
+  var TAGCOL={fail:'#A33A28', warn:'#E5920C', pass:'#2E7D5B'};
+  var i=0, mode='ser';
+  var $=function(id){return document.getElementById(id);};
+
+  function render(){
+    var p=PAIRS[i], f=p[mode], isBad=!!f.bad;
+    $('sent').className = isBad?'bad':'';
+    $('sent').innerHTML = p.subj+' <span class="v" style="background:'+
+      (mode==='ser'?'#2F6F8F':'#A33A28')+'">'+f.v+'</span> '+p.adj+'.';
+    $('gloss').innerHTML = (isBad?'✗ ':'')+f.en;
+    $('gloss').style.color = isBad?'#A33A28':'#3A4A5A';
+    $('mean').innerHTML = f.mean;
+    $('sSer').innerHTML = p.ser.v;
+    $('sEstar').innerHTML = p.estar.v;
+    $('bSer').className = mode==='ser'?'on':'';
+    $('bEstar').className = mode==='estar'?'on':'';
+    var showCmp = mode==='estar' && !isBad && f.cmp;
+    $('cmpPanel').className = 'panel'+(showCmp?'':' off');
+    if(showCmp) $('cmp').innerHTML = f.cmp;
+    $('count').textContent = (i+1)+' of '+PAIRS.length;
+    $('verdict').classList.remove('show');
+  }
+
+  $('bSer').addEventListener('click',function(){ mode='ser'; render(); });
+  $('bEstar').addEventListener('click',function(){ mode='estar'; render(); });
+  $('next').addEventListener('click',function(){ i=(i+1)%PAIRS.length; mode='ser'; render(); });
+  $('prev').addEventListener('click',function(){ i=(i-1+PAIRS.length)%PAIRS.length; mode='ser'; render(); });
+  $('test').addEventListener('click',function(){
+    var p=PAIRS[i];
+    $('vTag').textContent=p.tag; $('vTag').style.color=TAGCOL[p.ok];
+    $('verdict').style.borderColor=TAGCOL[p.ok];
+    $('vTxt').innerHTML=p.why;
+    $('verdict').classList.add('show');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

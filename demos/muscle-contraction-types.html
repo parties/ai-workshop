@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Concentric, eccentric, isometric — one picture, three different answers</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --con:#2F6F8F; --ecc:#A33A28; --iso:#5A6A78; --signal:#E5920C;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:22px 26px 34px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
+.sub{color:var(--ink-2);font-size:19px;margin:0 0 20px;max-width:76ch}
+.wrap{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:30px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+svg{width:100%;aspect-ratio:380/520;display:block;background:var(--paper-2);
+  border:2px solid var(--rule);border-radius:12px;touch-action:none;cursor:grab}
+svg.grabbing{cursor:grabbing}
+.verdict{border:3px solid var(--iso);border-radius:12px;background:#fff;padding:18px 22px;margin-bottom:18px}
+#label{font-size:54px;font-weight:800;letter-spacing:-1px;line-height:1;color:var(--iso)}
+#gloss{font-size:21px;color:var(--ink-2);margin-top:8px;min-height:3.1em}
+.meter{margin:16px 0}
+.meter .cap{display:flex;justify-content:space-between;font-size:17px;
+  font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.7px}
+.bar{height:34px;background:var(--paper-2);border:2px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:5px}
+.fill{height:100%;width:0;transition:width .05s linear}
+#lenFill{background:var(--signal)}
+#frcFill{background:var(--ecc)}
+.ctl{margin-top:18px}
+.ctl label{display:block;font-size:17px;font-weight:700;color:var(--ink-2);
+  text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+input[type=range]{width:100%;height:40px;accent-color:var(--con);cursor:pointer}
+.note{margin-top:22px;padding:14px 18px;border-left:6px solid var(--signal);
+  background:var(--paper-2);font-size:18px;color:var(--ink-2)}
+.hint{font-size:17px;color:var(--ink-3);text-align:center;margin-top:8px}
+b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<h1>The same still frame. Three different answers.</h1>
+<p class="sub">A photo of an arm at 90&deg; cannot tell you whether the athlete is lifting or lowering &mdash;
+and that difference is the whole concept. <b>Drag the forearm up and down.</b></p>
+
+<div class="wrap">
+  <div>
+    <svg id="arm" viewBox="0 0 380 520">
+      <line x1="150" y1="90" x2="150" y2="260" stroke="#3A4A5A" stroke-width="22" stroke-linecap="round"/>
+      <line id="muscle" x1="150" y1="132" x2="150" y2="308" stroke="#A33A28" stroke-width="18" stroke-linecap="round" opacity=".9"/>
+      <line id="fore" x1="150" y1="260" x2="150" y2="460" stroke="#3A4A5A" stroke-width="20" stroke-linecap="round"/>
+      <circle cx="150" cy="90" r="15" fill="#16202B"/>
+      <circle id="elb" cx="150" cy="260" r="13" fill="#16202B"/>
+      <g id="hand">
+        <circle cx="150" cy="460" r="17" fill="#16202B"/>
+        <rect id="wt" x="126" y="476" width="48" height="26" rx="5" fill="#16202B"/>
+        <text id="wtTxt" x="150" y="495" text-anchor="middle" font-size="16" font-weight="700" fill="#F3F6F8">25</text>
+      </g>
+      <text id="arrow" x="300" y="270" text-anchor="middle" font-size="46" font-weight="800" fill="#5A6A78">&ndash;</text>
+    </svg>
+    <p class="hint">Drag the arm, or use the elbow slider below.</p>
+  </div>
+
+  <div>
+    <div class="verdict" id="card">
+      <div id="label">ISOMETRIC</div>
+      <div id="gloss">Length is not changing &mdash; and the force is still there. That is a contraction too.</div>
+    </div>
+
+    <div class="meter">
+      <div class="cap"><span>Muscle length</span><span id="lenTxt">&mdash;</span></div>
+      <div class="bar"><div class="fill" id="lenFill"></div></div>
+    </div>
+
+    <div class="meter">
+      <div class="cap"><span>Muscle force</span><span id="frcTxt">&mdash;</span></div>
+      <div class="bar"><div class="fill" id="frcFill"></div></div>
+    </div>
+
+    <div class="ctl">
+      <label for="flex">Elbow angle</label>
+      <input type="range" id="flex" min="15" max="145" value="20" step="0.5">
+    </div>
+
+    <div class="ctl">
+      <label for="wgt">Weight in the hand &mdash; <span id="wgtTxt">25 lb</span></label>
+      <input type="range" id="wgt" min="0" max="50" value="25" step="1">
+    </div>
+
+    <div class="note">Move the weight slider: the force bar changes, the label never does.
+    <b>Force is about load. The label is about which direction the muscle is travelling.</b>
+    At any one angle the force is identical whether you are lifting or lowering &mdash; but only the
+    lowering half is eccentric, and that is the half that tears hamstrings and Achilles tendons.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var S={x:150,y:90}, UP=170, FORE=200, ORIG=42, INS=48;
+  var LMIN=92.8, LMAX=174.9, FMAX=224;
+  var flex=20, weight=25, lastLen=null, lastMove=0, dir=0;
+
+  var svg=document.getElementById('arm'), muscle=document.getElementById('muscle'),
+      fore=document.getElementById('fore'), hand=document.getElementById('hand'),
+      arrow=document.getElementById('arrow'), wtTxt=document.getElementById('wtTxt'),
+      label=document.getElementById('label'), gloss=document.getElementById('gloss'),
+      card=document.getElementById('card'), lenFill=document.getElementById('lenFill'),
+      frcFill=document.getElementById('frcFill'), lenTxt=document.getElementById('lenTxt'),
+      frcTxt=document.getElementById('frcTxt'), flexIn=document.getElementById('flex'),
+      wgtIn=document.getElementById('wgt'), wgtTxt=document.getElementById('wgtTxt');
+
+  var EY=S.y+UP;
+  function rad(f){return f*Math.PI/180;}
+  function ins(f){return {x:S.x+INS*Math.sin(rad(f)), y:EY+INS*Math.cos(rad(f))};}
+  function hnd(f){return {x:S.x+FORE*Math.sin(rad(f)), y:EY+FORE*Math.cos(rad(f))};}
+  function mlen(f){var i=ins(f); return Math.hypot(i.x-S.x, i.y-(S.y+ORIG));}
+  // Load moment about the elbow scales with sin(flex); muscle force = that moment
+  // divided by the biceps' short moment arm, which is why the numbers get large.
+  function force(f,w){return (w+3.6)*Math.sin(rad(f))*(FORE/INS);}
+
+  var MODES={
+    con:{name:'CONCENTRIC', col:'#2F6F8F', arrow:'↑',
+      text:'Muscle is <b>shortening</b> while it pulls. This is the lifting half — the half everybody already calls a contraction.'},
+    ecc:{name:'ECCENTRIC', col:'#A33A28', arrow:'↓',
+      text:'Muscle is <b>lengthening</b> while it pulls — still contracting, and getting longer. This is the lowering half: most soreness, most hamstring and Achilles injuries.'},
+    iso:{name:'ISOMETRIC', col:'#5A6A78', arrow:'–',
+      text:'Length is not changing — and the force is still there. That is a contraction too.'}
+  };
+  var mode='iso';
+
+  function draw(){
+    var h=hnd(flex), i=ins(flex), o={x:S.x,y:S.y+ORIG}, L=mlen(flex);
+    fore.setAttribute('x2',h.x); fore.setAttribute('y2',h.y);
+    muscle.setAttribute('x2',i.x); muscle.setAttribute('y2',i.y);
+    muscle.setAttribute('y1',o.y);
+    muscle.setAttribute('stroke-width', 14 + 20*(1-(L-LMIN)/(LMAX-LMIN)));
+    hand.setAttribute('transform','translate('+(h.x-150)+','+(h.y-460)+')');
+    wtTxt.textContent = weight;
+
+    var lp=(L-LMIN)/(LMAX-LMIN), F=force(flex,weight);
+    lenFill.style.width=(6+94*lp)+'%';
+    frcFill.style.width=(Math.min(1,F/FMAX)*100)+'%';
+    lenTxt.textContent=L.toFixed(0)+' units';
+    frcTxt.textContent=F.toFixed(0)+' lb of pull';
+
+    var m=MODES[mode];
+    label.textContent=m.name; label.style.color=m.col;
+    card.style.borderColor=m.col;
+    gloss.innerHTML=m.text;
+    arrow.textContent=m.arrow; arrow.setAttribute('fill',m.col);
+  }
+
+  function tick(now){
+    var L=mlen(flex);
+    if(lastLen!==null && Math.abs(L-lastLen)>0.15){ dir=L<lastLen?-1:1; lastMove=now; }
+    lastLen=L;
+    if(now-lastMove>200) dir=0;
+    var next = dir<0?'con':dir>0?'ecc':'iso';
+    if(next!==mode){ mode=next; }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  function setFlex(f){ flex=Math.max(15,Math.min(145,f)); flexIn.value=flex; }
+
+  function pt(ev){
+    var r=svg.getBoundingClientRect();
+    return {x:(ev.clientX-r.left)*(380/r.width), y:(ev.clientY-r.top)*(520/r.height)};
+  }
+  var dragging=false;
+  svg.addEventListener('pointerdown',function(ev){
+    dragging=true; svg.classList.add('grabbing'); svg.setPointerCapture(ev.pointerId);
+    var p=pt(ev); setFlex(Math.atan2(p.x-S.x, p.y-EY)*180/Math.PI);
+  });
+  svg.addEventListener('pointermove',function(ev){
+    if(!dragging) return;
+    var p=pt(ev); setFlex(Math.atan2(p.x-S.x, p.y-EY)*180/Math.PI);
+  });
+  function stop(){ dragging=false; svg.classList.remove('grabbing'); }
+  svg.addEventListener('pointerup',stop);
+  svg.addEventListener('pointercancel',stop);
+
+  flexIn.addEventListener('input',function(){ flex=parseFloat(flexIn.value); });
+  wgtIn.addEventListener('input',function(){
+    weight=parseInt(wgtIn.value,10); wgtTxt.textContent=weight+' lb';
+  });
+
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
