@@ -18,7 +18,7 @@ h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
 .sub{color:var(--ink-2);margin:0 0 16px;max-width:84ch}
 .wrap{display:grid;grid-template-columns:1fr minmax(330px,420px);gap:28px;align-items:start}
 @media (max-width:1000px){.wrap{grid-template-columns:1fr}}
-canvas{width:100%;aspect-ratio:9/7;display:block;background:var(--paper-2);
+canvas{width:100%;aspect-ratio:9/7;max-height:58vh;display:block;background:var(--paper-2);
   border:2px solid var(--rule);border-radius:12px}
 #banner{margin-top:12px;padding:14px 18px;border-radius:10px;font-size:26px;font-weight:800;
   text-align:center;background:#fff;border:3px solid var(--rule);color:var(--ink-3);letter-spacing:-.3px}
@@ -40,8 +40,8 @@ h2{font-size:17px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-2
 #check{width:100%;font:inherit;font-size:21px;font-weight:800;padding:13px;margin-bottom:14px;
   border:2px solid var(--signal);background:#FDF3E0;border-radius:10px;cursor:pointer}
 #check:disabled{opacity:.45;cursor:default}
-#explain{padding:14px 17px;border-left:6px solid var(--signal);background:var(--paper-2);
-  font-size:18px;color:var(--ink-2);display:none}
+#explain{margin-top:14px;padding:16px 20px;border-left:6px solid var(--signal);background:var(--paper-2);
+  font-size:19px;color:var(--ink-2);display:none}
 #explain.show{display:block}
 .hide{display:none}
 b{color:var(--ink)}
@@ -57,6 +57,7 @@ before and after &mdash; and cause-versus-effect <em>is</em> the order. <b>Pick 
   <div>
     <canvas id="cv" width="900" height="700"></canvas>
     <div id="banner">Pick a shock to begin</div>
+    <div id="explain"></div>
   </div>
 
   <div>
@@ -82,8 +83,6 @@ before and after &mdash; and cause-versus-effect <em>is</em> the order. <b>Pick 
       </div>
       <button id="check" disabled>Check my prediction</button>
     </div>
-
-    <div id="explain"></div>
   </div>
 </div>
 
@@ -127,14 +126,14 @@ before and after &mdash; and cause-versus-effect <em>is</em> the order. <b>Pick 
   function sup(q,A){return (A===undefined?st.sA:A)+BASE.sB*q;}
   function eq(){var q=(st.dA-st.sA)/(BASE.dB+BASE.sB); return {q:q,p:dem(q)};}
 
-  function line(fn,color,width,dash,label){
+  function line(fn,color,width,dash,label,dy){
     ctx.save();
     ctx.beginPath(); ctx.rect(M.l,M.t,W-M.l-M.r,H-M.t-M.b); ctx.clip();
     ctx.beginPath(); ctx.setLineDash(dash||[]); ctx.strokeStyle=color; ctx.lineWidth=width;
     ctx.moveTo(px(0),py(fn(0))); ctx.lineTo(px(100),py(fn(100))); ctx.stroke();
     if(label){
       ctx.setLineDash([]); ctx.fillStyle=color; ctx.font='800 24px ui-sans-serif,system-ui,sans-serif';
-      ctx.textAlign='left'; ctx.fillText(label, px(88)+8, py(fn(88)));
+      ctx.textAlign='left'; ctx.fillText(label, px(76), py(fn(76))+(dy||0));
     }
     ctx.restore();
   }
@@ -161,8 +160,8 @@ before and after &mdash; and cause-versus-effect <em>is</em> the order. <b>Pick 
       else line(function(q){return sup(q,BASE.sA);},'#A9C6D4',4,[9,8]);
     }
 
-    line(function(q){return dem(q);},'#A33A28',6,null,'D');
-    line(function(q){return sup(q);},'#2F6F8F',6,null,'S');
+    line(function(q){return dem(q);},'#A33A28',6,null,'D',34);
+    line(function(q){return sup(q);},'#2F6F8F',6,null,'S',-20);
 
     if(trail.length>1){
       ctx.save(); ctx.beginPath(); ctx.strokeStyle='#E5920C'; ctx.lineWidth=9;

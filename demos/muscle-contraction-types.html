@@ -16,9 +16,9 @@ body{margin:0;padding:22px 26px 34px;background:var(--paper);color:var(--ink);
   font-size:19px;line-height:1.45;-webkit-font-smoothing:antialiased}
 h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
 .sub{color:var(--ink-2);font-size:19px;margin:0 0 20px;max-width:76ch}
-.wrap{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:30px;align-items:start}
+.wrap{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:start}
 @media (max-width:860px){.wrap{grid-template-columns:1fr}}
-svg{width:100%;aspect-ratio:380/520;display:block;background:var(--paper-2);
+svg{height:min(64vh,720px);width:auto;aspect-ratio:220/460;display:block;margin:0 auto;background:var(--paper-2);
   border:2px solid var(--rule);border-radius:12px;touch-action:none;cursor:grab}
 svg.grabbing{cursor:grabbing}
 .verdict{border:3px solid var(--iso);border-radius:12px;background:#fff;padding:18px 22px;margin-bottom:18px}
@@ -49,7 +49,7 @@ and that difference is the whole concept. <b>Drag the forearm up and down.</b></
 
 <div class="wrap">
   <div>
-    <svg id="arm" viewBox="0 0 380 520">
+    <svg id="arm" viewBox="120 60 220 460">
       <line x1="150" y1="90" x2="150" y2="260" stroke="#3A4A5A" stroke-width="22" stroke-linecap="round"/>
       <line id="muscle" x1="150" y1="132" x2="150" y2="308" stroke="#A33A28" stroke-width="18" stroke-linecap="round" opacity=".9"/>
       <line id="fore" x1="150" y1="260" x2="150" y2="460" stroke="#3A4A5A" stroke-width="20" stroke-linecap="round"/>
@@ -60,7 +60,7 @@ and that difference is the whole concept. <b>Drag the forearm up and down.</b></
         <rect id="wt" x="126" y="476" width="48" height="26" rx="5" fill="#16202B"/>
         <text id="wtTxt" x="150" y="495" text-anchor="middle" font-size="16" font-weight="700" fill="#F3F6F8">25</text>
       </g>
-      <text id="arrow" x="300" y="270" text-anchor="middle" font-size="46" font-weight="800" fill="#5A6A78">&ndash;</text>
+      <text id="arrow" x="315" y="250" text-anchor="middle" font-size="46" font-weight="800" fill="#5A6A78">&ndash;</text>
     </svg>
     <p class="hint">Drag the arm, or use the elbow slider below.</p>
   </div>
@@ -169,7 +169,7 @@ and that difference is the whole concept. <b>Drag the forearm up and down.</b></
 
   function pt(ev){
     var r=svg.getBoundingClientRect();
-    return {x:(ev.clientX-r.left)*(380/r.width), y:(ev.clientY-r.top)*(520/r.height)};
+    return {x:120+(ev.clientX-r.left)*(220/r.width), y:60+(ev.clientY-r.top)*(460/r.height)};
   }
   var dragging=false;
   svg.addEventListener('pointerdown',function(ev){
