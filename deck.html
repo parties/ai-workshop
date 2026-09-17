@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Building teaching apps in one conversation</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --anchor:#2F6F8F; --signal:#E5920C; --hot:#A33A28;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);overflow:hidden;
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.3;-webkit-font-smoothing:antialiased}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;
+  padding:5vmin 7vmin 11vmin}
+.slide.on{display:flex}
+.kicker{font-size:2.1vmin;font-weight:800;letter-spacing:.35vmin;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:2.2vmin}
+h1{font-size:7.4vmin;line-height:1.05;letter-spacing:-.18vmin;margin:0 0 3vmin;max-width:24ch}
+h2{font-size:5.6vmin;line-height:1.08;letter-spacing:-.14vmin;margin:0 0 3vmin;max-width:26ch}
+p{font-size:3.3vmin;color:var(--ink-2);margin:0 0 2vmin;max-width:52ch}
+p.big{font-size:4.1vmin;color:var(--ink)}
+em{color:var(--hot);font-style:normal;font-weight:700}
+pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:2.55vmin;line-height:1.62;margin:0;white-space:pre-wrap;
+  background:#fff;border:.35vmin solid var(--rule);border-radius:1.4vmin;padding:2.6vmin 3vmin;
+  color:var(--ink-3);max-width:62ch}
+pre .lit{color:var(--ink);font-weight:600}
+pre .hot{background:#FDE3AE;color:var(--ink);font-weight:800;border-radius:.5vmin;
+  box-shadow:0 0 0 .5vmin #FDE3AE}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:4vmin;align-items:center}
+.rule1{background:#FBF0EE;border-left:1.2vmin solid var(--hot);border-radius:1.2vmin;
+  padding:3.4vmin 4vmin;max-width:44ch}
+.rule1 strong{display:block;font-size:5.4vmin;letter-spacing:-.14vmin;color:var(--hot);margin-bottom:1.6vmin}
+ul{margin:0;padding-left:3.2vmin;max-width:50ch}
+li{font-size:3vmin;color:var(--ink-2);margin-bottom:1.4vmin}
+li b{color:var(--ink)}
+.url{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:6.6vmin;font-weight:700;letter-spacing:-.18vmin;color:var(--anchor);
+  background:#fff;border:.5vmin solid var(--anchor);border-radius:1.6vmin;
+  padding:3.2vmin 4vmin;display:inline-block;margin:1vmin 0 3vmin;word-break:break-all}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:2vmin;
+  padding:1.6vmin 3vmin;background:rgba(232,237,241,.94);border-top:.25vmin solid var(--rule)}
+.nav button{font:inherit;font-size:2.4vmin;font-weight:800;padding:1.1vmin 2.6vmin;
+  border:.3vmin solid var(--ink-2);background:#fff;color:var(--ink);border-radius:1vmin;cursor:pointer}
+.nav button:hover{background:#fff;border-color:var(--ink)}
+.dots{display:flex;gap:1.1vmin;margin-left:1vmin}
+.dots i{width:1.5vmin;height:1.5vmin;border-radius:50%;background:var(--rule);cursor:pointer}
+.dots i.on{background:var(--ink)}
+.count{margin-left:auto;font-size:2.2vmin;color:var(--ink-3);font-weight:700}
+.hint{font-size:2vmin;color:var(--ink-3);margin-left:1.5vmin}
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide on">
+  <div class="kicker">Eric Ogden &middot; 17 September 2026</div>
+  <h1>An artifact is a working app that Claude builds inside the conversation.</h1>
+  <p class="big">Not code you download. Not a thing you install. You describe what you want, it appears
+  next to the chat, and you keep talking until it is right.</p>
+  <p><em>These slides are an artifact.</em> So is everything I am about to show you.</p>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">Thirty seconds, and it is the important thirty seconds</div>
+  <div class="two">
+    <div>
+      <div class="rule1"><strong>Never paste student names or identifiers.</strong>
+      That is the whole rule. If you remember one sentence from this, make it that one.</div>
+    </div>
+    <div>
+      <p>Everything I am showing you today contains <b>zero student data</b>. Every name and score in
+      these demos is invented.</p>
+      <p>It is not just names. In a school our size, &ldquo;the student who moved here from Guam in
+      October&rdquo; identifies a kid exactly as well as a name does. So do IEP details, medical details,
+      and filenames like <code>smith_jordan_essay.docx</code>.</p>
+      <p>The vendor&rsquo;s terms and <em>your authorisation</em> are two different gates, and only the
+      district opens the second one. Long version, plus an email you can send Monday:
+      <b>README.md, the Student Privacy section.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">The prompt &mdash; 1 of 3</div>
+  <h2>One paragraph. Paste it and fill in the blank.</h2>
+  <pre><span class="lit">I want to build a small interactive web app that helps my students understand
+[CONCEPT]. Before you build anything, interview me: ask me one question at a
+time about what my students already believe about this, where they get stuck,
+what they should be able to do differently after using it, and how much class
+time they'll have with it. Keep asking follow-up questions until you could
+describe the finished app back to me and I'd say "yes, that's it." Then build
+it as a single interactive artifact.</span></pre>
+  <p style="margin-top:2.4vmin">No install. No GitHub. No skill to set up. A browser and a free account.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">The prompt &mdash; 2 of 3</div>
+  <h2>This is the clause. The rest is scaffolding around it.</h2>
+  <pre>I want to build a small interactive web app that helps my students understand
+[CONCEPT]. Before you build anything, interview me: <span class="hot">ask me one question at a
+time</span> about what my students already believe about this, where they get stuck,
+what they should be able to do differently after using it, and how much class
+time they'll have with it. Keep asking follow-up questions until you could
+describe the finished app back to me and I'd say "yes, that's it." Then build
+it as a single interactive artifact.</pre>
+  <p style="margin-top:2.4vmin"><b>Say it out loud: <em>ask me one question at a time.</em></b>
+  Without it you get eight questions in a wall of text and you answer two of them. With it you get a
+  conversation &mdash; and the app comes out matching <em>your</em> class, not the internet&rsquo;s average class.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">The prompt &mdash; 3 of 3</div>
+  <h2>It asks about teaching, and it knows when to stop.</h2>
+  <pre>I want to build a small interactive web app that helps my students understand
+[CONCEPT]. Before you build anything, interview me: ask me one question at a
+time about <span class="hot">what my students already believe about this, where they get stuck,
+what they should be able to do differently after using it, and how much class
+time they'll have with it.</span> <span class="hot">Keep asking follow-up questions until you could
+describe the finished app back to me and I'd say "yes, that's it."</span> Then build
+it as a single interactive artifact.</pre>
+  <ul style="margin-top:2.4vmin">
+    <li><b>Four questions about teaching</b>, not about software. Prior beliefs, sticking points,
+    what they can do afterwards, how long you actually have.</li>
+    <li><b>A stop condition.</b> &ldquo;Until you could describe it back and I&rsquo;d say yes, that&rsquo;s it&rdquo;
+    is what keeps it asking instead of guessing.</li>
+  </ul>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Everything you just saw, plus the prompt for each one</div>
+  <h2 style="margin-bottom:1.4vmin">Take a picture of this.</h2>
+  <div class="url">parties.github.io/ai-workshop</div>
+  <p class="big">Five demos. Every one opens in a browser with nothing installed, and every one shows
+  the exact prompt that built it &mdash; so you can copy it, change the concept, and have your own by Monday.</p>
+</section>
+
+<div class="nav">
+  <button id="prev">&larr; Back</button>
+  <button id="next">Next &rarr;</button>
+  <div class="dots" id="dots"></div>
+  <span class="hint">click, arrow keys, or space</span>
+  <span class="count" id="count"></span>
+</div>
+
+<script>
+(function(){
+  var S=document.querySelectorAll('.slide'), i=0, dots=document.getElementById('dots');
+  for(var d=0;d<S.length;d++){
+    (function(n){
+      var el=document.createElement('i');
+      el.addEventListener('click',function(ev){ ev.stopPropagation(); go(n); });
+      dots.appendChild(el);
+    })(d);
+  }
+  function go(n){
+    i=Math.max(0,Math.min(S.length-1,n));
+    for(var j=0;j<S.length;j++){
+      S[j].classList.toggle('on',j===i);
+      dots.children[j].classList.toggle('on',j===i);
+    }
+    document.getElementById('count').textContent=(i+1)+' / '+S.length;
+  }
+  document.getElementById('next').addEventListener('click',function(ev){ev.stopPropagation();go(i+1);});
+  document.getElementById('prev').addEventListener('click',function(ev){ev.stopPropagation();go(i-1);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(i+1); }
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(i-1); }
+    if(e.key==='Home') go(0);
+    if(e.key==='End') go(S.length-1);
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('.nav')) return;
+    go(e.clientX < window.innerWidth*0.28 ? i-1 : i+1);
+  });
+  go(0);
+})();
+</script>
+</body>
+</html>
