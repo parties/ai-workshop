@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wireless Attacks · AP Cybersecurity 1.3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+  :root {
+    --night: #120a26;
+    --panel: #1d1338;
+    --panel-2: #261a48;
+    --line: #3d2d6e;
+    --ink: #eee9ff;
+    --dim: #aea3d6;
+    --magenta: #ff3d8b;
+    --cyan: #3be3ff;
+    --amber: #ffc857;
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 85% -10%, rgba(255,61,139,.22), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 0% 10%, rgba(59,227,255,.14), transparent 60%),
+      var(--night);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 64px; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; }
+  h1 { font-size: clamp(30px, 4.6vw, 44px); font-weight: 700; }
+  h2 { font-size: 28px; margin-bottom: 8px; }
+  h3 { font-size: 20px; }
+  p { margin: 0 0 12px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  /* hero */
+  .topbar { display: flex; justify-content: space-between; color: var(--dim); font-size: 14px; margin-bottom: 20px; }
+  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: center; margin-bottom: 28px; }
+  .hero h1 { text-shadow: 0 0 18px rgba(59,227,255,.35); }
+  .lede { color: var(--dim); margin-top: 14px; max-width: 46ch; }
+  .wifi { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: 0 0 0 1px rgba(255,61,139,.15), 0 12px 40px rgba(255,61,139,.12); }
+  .wifi-head { font-family: var(--display); font-weight: 700; margin-bottom: 8px; }
+  .wifi-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; }
+  .wifi-row + .wifi-row { border-top: 1px solid var(--line); }
+  .wifi-row .name { flex: 1; }
+  .bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
+  .bars i { display: block; width: 4px; background: var(--cyan); border-radius: 1px; }
+  .bars i.off { background: var(--line); }
+  .twin .name { color: var(--magenta); animation: glitch 3.2s infinite steps(1); }
+  .wifi-foot { color: var(--dim); font-size: 14px; margin-top: 8px; }
+  @keyframes glitch {
+    0%, 88%, 100% { transform: none; text-shadow: none; }
+    90% { transform: translateX(2px); text-shadow: -2px 0 var(--cyan); }
+    93% { transform: translateX(-2px); text-shadow: 2px 0 var(--amber); }
+  }
+
+  /* stepper */
+  .steps { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; position: sticky; top: 0; z-index: 5; padding: 10px 0; background: linear-gradient(var(--night) 70%, transparent); }
+  .step { display: flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 6px; cursor: pointer; }
+  .step .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-weight: 700; background: var(--panel-2); }
+  .step[aria-current="step"] { border-color: var(--cyan); box-shadow: 0 0 14px rgba(59,227,255,.3); }
+  .step[aria-current="step"] .n { background: var(--cyan); color: var(--night); }
+
+  .section-intro { color: var(--dim); max-width: 62ch; margin-bottom: 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  .ced { background: var(--night); border-left: 3px solid var(--cyan); border-radius: 4px; padding: 12px 14px; margin: 10px 0 14px; }
+  .ced .code { font-family: var(--display); color: var(--cyan); font-weight: 700; margin-right: 6px; }
+  .ced ul { margin: 6px 0 0; padding-left: 20px; }
+  .muted { color: var(--dim); }
+
+  /* sorter */
+  .sort-item { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+  .sort-item:first-of-type { border-top: 0; }
+  .choice-group { display: flex; gap: 6px; }
+  .chip { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .chip:hover { border-color: var(--cyan); }
+  .chip.right { background: rgba(59,227,255,.15); border-color: var(--cyan); }
+  .chip.wrong { background: rgba(255,61,139,.15); border-color: var(--magenta); }
+  .feedback { grid-column: 1 / -1; font-size: 15px; padding-left: 10px; border-left: 2px solid; }
+  .feedback.right { border-color: var(--cyan); }
+  .feedback.wrong { border-color: var(--magenta); }
+  .chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; grid-column: 1 / -1; }
+
+  /* attack tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 0; }
+  .tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 18px; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--dim); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--magenta); }
+  .attack-body { border-top: 0; border-radius: 0 0 12px 12px; }
+  .attack-sub { font-size: 20px; margin-bottom: 8px; color: var(--amber); font-family: var(--display); }
+  .notes { margin: 0; padding-left: 20px; }
+  .notes li { margin-bottom: 6px; }
+
+  /* incidents */
+  .incident-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .done-tag { font-size: 14px; color: var(--dim); }
+  .done-tag.full { color: var(--cyan); }
+  .scenario { font-size: 18px; background: var(--night); border-radius: 8px; padding: 14px; margin: 8px 0 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-weight: 700; margin-bottom: 5px; }
+  select, input[type="text"], textarea {
+    width: 100%; background: var(--night); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
+  }
+  select { max-width: 280px; }
+  textarea { min-height: 76px; resize: vertical; }
+  select:focus, input:focus, textarea:focus { border-color: var(--cyan); outline: none; box-shadow: 0 0 0 2px rgba(59,227,255,.25); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* submit */
+  .btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 700; }
+  .btn:hover { border-color: var(--cyan); }
+  .btn.primary { background: var(--magenta); border-color: var(--magenta); color: #fff; box-shadow: 0 0 18px rgba(255,61,139,.4); }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn.ghost { background: none; color: var(--dim); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .status { font-size: 15px; color: var(--cyan); }
+  .status.warn { color: var(--amber); }
+  .missing { color: var(--amber); margin: 6px 0 0; padding-left: 20px; }
+  .preview { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px; min-height: 280px; line-height: 1.45; }
+  .nav-foot { display: flex; justify-content: space-between; margin-top: 22px; }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; }
+    .row2 { grid-template-columns: 1fr; }
+    .sort-item { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .twin .name { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root"><p style="padding:24px">Loading lesson…</p></div>
+<script>
+(function () {
+  if (!window.React || !window.ReactDOM) {
+    document.getElementById("root").innerHTML =
+      '<p style="padding:24px">This page needs an internet connection to load. Refresh once you are online.</p>';
+    return;
+  }
+  var h = React.createElement;
+  var useState = React.useState, useEffect = React.useEffect, useMemo = React.useMemo;
+  var STORE_KEY = "apcyber-1.3-wireless-v1";
+  var WARM_KEY = "apcyber-1.3-wireless-warmup-v1";
+  /* Change this key if you like; the decoder must use the same string. */
+  var OBF_KEY = "hanford-1.3-wireless";
+
+  function loadWarm() {
+    try { return JSON.parse(localStorage.getItem(WARM_KEY)) || {}; } catch (e) { return {}; }
+  }
+  /* XOR every UTF-8 byte with the repeating key, then Base64 the result. */
+  function encodeWarmup(obj) {
+    var bytes = new TextEncoder().encode(JSON.stringify(obj));
+    var key = new TextEncoder().encode(OBF_KEY);
+    var bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i] ^ key[i % key.length]);
+    return btoa(bin);
+  }
+  function warmupPayload(name, period, warm) {
+    var all = SKILL_ITEMS.map(function (it) { return { item: it, kind: "Skill level (low or high)" }; })
+      .concat(MOTIVE_ITEMS.map(function (it) { return { item: it, kind: "Motivation" }; }));
+    var firstRight = 0;
+    var items = all.map(function (x) {
+      var w = warm[x.item.id];
+      var ok = !!(w && w.first === x.item.answer);
+      if (ok) firstRight++;
+      return {
+        id: x.item.id, type: x.kind, question: x.item.text, correctAnswer: x.item.answer,
+        attempted: !!w, firstGuess: w ? w.first : null, firstGuessCorrect: ok,
+        totalClicks: w ? w.tries : 0, firstGuessAt: w ? w.at : null
+      };
+    });
+    return {
+      format: "apcyber-1.3-warmup-v1",
+      student: name.trim(), period: period.trim(), exportedAt: new Date().toISOString(),
+      firstTryScore: firstRight + "/" + all.length, items: items
+    };
+  }
+
+  /* ---------- content ---------- */
+  var SKILL_ITEMS = [
+    { id: "s1", text: "Buys a Wi-Fi attack tool online and aims it at routers with a known, published flaw.", answer: "Low",
+      why: "Low skill: a tool someone else made, aimed at a known vulnerability." },
+    { id: "s2", text: "Finds a flaw in a router that nobody defending it has found yet, then builds a tool for it.", answer: "High",
+      why: "High skill: discovering an undocumented vulnerability (a zero day) and creating a new tool." },
+    { id: "s3", text: "Rewrites an existing tool so a new defense stops catching it.", answer: "High",
+      why: "High skill: modifying existing tools to adapt to new defensive techniques." },
+    { id: "s4", text: "Downloads a ready-made evil twin kit and follows the instructions that came with it.", answer: "Low",
+      why: "Low skill: relying on a malicious tool created by others." }
+  ];
+  var MOTIVES = ["Greed", "Desire for recognition", "Dedication to a cause", "Revenge", "Politics", "Beliefs"];
+  var MOTIVE_ITEMS = [
+    { id: "m1", text: "A worker is fired on Friday. On Monday, the office Wi-Fi goes down, and the only person nearby is the ex-employee sitting in a car outside.", answer: "Revenge" },
+    { id: "m2", text: "Someone collects logins from a fake coffee-shop network and sells the list to strangers online.", answer: "Greed" }
+  ];
+
+  var ATTACKS = [
+    { id: "evil", name: "Evil twin", code: "1.3.B.1",
+      ced: "In an evil twin attack, an adversary sets up their own wireless access point (WAP) with a service set identifier (SSID) similar or identical to a target network; the adversary\u2019s network is called the evil twin. Victims of this attack could select to unknowingly connect to the evil twin, allowing the adversary to capture their network traffic. The adversary cannot read traffic that uses an encrypted protocol like HTTPS.",
+      sub: "The adversary\u2019s network is real. It works, the pages load, and every packet goes through their hardware.",
+      notes: ["It never touches the network it\u2019s imitating.", "The name is the whole trick, so the name is where you check.", "HTTPS traffic still goes through them. They just can\u2019t read it."] },
+    { id: "jam", name: "Jamming", code: "1.3.B.2",
+      ced: "In a jamming attack, an adversary floods an area with a strong electromagnetic (EM) signal in the same frequency range as the wireless network, which prevents legitimate traffic between the access point (AP) and users. This type of attack that prevents users from accessing resources is called a denial of service (DoS) attack.",
+      sub: "Noise in the same frequency range, loud enough that nothing else gets through.",
+      notes: ["No account is broken into. Nobody logs in.", "Denying you the resource is the attack, which is what makes it a DoS."] },
+    { id: "war", name: "War driving", code: "1.3.B.3",
+      ced: "In a war driving attack, adversaries try to detect wireless network beacons while driving or walking around a target. If a wireless signal is detected, the adversary can gather information about the type of wireless network used and find areas where the wireless signal extends outside the physical building.",
+      sub: "Driving or walking around with something listening for beacons.",
+      notes: ["It\u2019s a survey, not a break-in.", "What it finds is where your signal reaches that your building doesn\u2019t."] }
+  ];
+
+  var INCIDENTS = [
+    { title: "The coffee shop",
+      text: "You\u2019re in a coffee shop and the network list shows Brewhouse Guest and Brewhouse-Guest. You tap the second one, the page loads, and you read email for an hour." },
+    { title: "The east hallway",
+      text: "Wi-Fi drops for everyone in the east hallway at the same minute. The wired computers in those same rooms keep working. It comes back twenty minutes later, on its own." },
+    { title: "The parked car",
+      text: "The same car parks across from an office three evenings in a row, never for long. A month later somebody signs in to the building\u2019s network from the parking lot." }
+  ];
+  var QUESTIONS = [
+    { key: "attack", text: "Which attack is this?" },
+    { key: "detail", text: "What is the one detail that told you?" },
+    { key: "https", text: "Would HTTPS have helped? (Yes or No)" },
+    { key: "httpsWhy", text: "Explain your HTTPS answer." }
+  ];
+  var FINAL_QUESTIONS = [
+    { key: "which", text: "One of these three incidents is not, by itself, an attack on anybody\u2019s data. Which one?" },
+    { key: "why", text: "Explain why that incident is not, by itself, an attack on anybody\u2019s data." }
+  ];
+
+  function blankResponses() {
+    return {
+      i1: { attack: "", detail: "", https: "", httpsWhy: "" },
+      i2: { attack: "", detail: "", https: "", httpsWhy: "" },
+      i3: { attack: "", detail: "", https: "", httpsWhy: "" },
+      final: { which: "", why: "" }
+    };
+  }
+  function loadSaved() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return null;
+      var d = JSON.parse(raw);
+      var base = blankResponses();
+      if (d && d.resp) {
+        Object.keys(base).forEach(function (k) { base[k] = Object.assign(base[k], d.resp[k] || {}); });
+      }
+      return { name: d.name || "", period: d.period || "", resp: base };
+    } catch (e) { return null; }
+  }
+
+  /* ---------- export ---------- */
+  function quoteAnswer(v) {
+    var t = (v || "").trim();
+    if (!t) return ["> _(no answer)_"];
+    return t.split(/\r?\n/).map(function (line) { return "> " + line; });
+  }
+  function buildMarkdown(name, period, resp, warm) {
+    var L = [];
+    L.push("# Wireless attacks: incident analysis", "");
+    L.push("- **Course:** AP Cybersecurity, Unit 1, Topic 1.3 (Best Practices for Public Networks)");
+    L.push("- **Student:** " + (name.trim() || "_(not entered)_"));
+    L.push("- **Period:** " + (period.trim() || "_(not entered)_"));
+    L.push("- **Exported:** " + new Date().toLocaleString());
+    L.push("- **Attacks in scope:** evil twin (1.3.B.1), jamming (1.3.B.2), war driving (1.3.B.3)", "");
+    L.push("**Directions given to the student:** For each incident, name the attack, write down the one detail that told you, and say whether HTTPS would have helped.");
+    INCIDENTS.forEach(function (inc, idx) {
+      var n = idx + 1, r = resp["i" + n];
+      L.push("", "---", "", "## Incident " + n + ": " + inc.title, "", "**Scenario:** " + inc.text, "");
+      QUESTIONS.forEach(function (q, qi) {
+        L.push("### Question " + n + "." + (qi + 1) + ": " + q.text, "", "**Student answer:**");
+        L.push.apply(L, quoteAnswer(r[q.key]));
+        L.push("");
+      });
+    });
+    L.push("---", "", "## Warm-up check (encoded)", "",
+      "Teacher-only record of first guesses on the step 1 practice questions. Students: leave this block as it is.", "",
+      "```", "WARMUP-V1:" + encodeWarmup(warmupPayload(name, period, warm)), "```", "");
+    L.push("---", "", "## Final question", "");
+    FINAL_QUESTIONS.forEach(function (q, qi) {
+      L.push("### Question 4." + (qi + 1) + ": " + q.text, "", "**Student answer:**");
+      L.push.apply(L, quoteAnswer(resp.final[q.key]));
+      L.push("");
+    });
+    return L.join("\n");
+  }
+  function copyText(text) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      return ok;
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); });
+    }
+    return Promise.resolve(fallback());
+  }
+
+  /* ---------- pieces ---------- */
+  function Bars(n) {
+    var out = [];
+    for (var i = 0; i < 4; i++) out.push(h("i", { key: i, className: i < n ? "" : "off", style: { height: (4 + i * 3) + "px" } }));
+    return h("span", { className: "bars", "aria-hidden": "true" }, out);
+  }
+  function WifiRow(name, strength, twin) {
+    return h("div", { className: "wifi-row" + (twin ? " twin" : ""), key: name },
+      Bars(strength), h("span", { className: "name" }, name), h("span", { className: "muted", style: { fontSize: 13 } }, "Open"));
+  }
+
+  function Hero() {
+    return h("header", { className: "hero" },
+      h("div", null,
+        h("h1", null, "Attacking the network instead of the password"),
+        h("p", { className: "lede" }, "We attacked passwords, found those attacks in logs, and defended with passphrases and MFA. Today the same pattern aims at the Wi-Fi you\u2019re sitting on. This is step one: define the attack.")),
+      h("div", { className: "wifi", role: "img", "aria-label": "A phone\u2019s Wi-Fi list showing Brewhouse Guest and Brewhouse-Guest side by side" },
+        h("div", { className: "wifi-head" }, "Wi-Fi networks"),
+        WifiRow("Brewhouse Guest", 3, false),
+        WifiRow("Brewhouse-Guest", 4, true),
+        WifiRow("HP-Print-3F", 1, false),
+        h("div", { className: "wifi-foot" }, "One of these two belongs to somebody sitting in the shop.")));
+  }
+
+  var STEP_NAMES = ["Who\u2019s attacking", "The three attacks", "Incidents", "Submit"];
+  function Steps(props) {
+    return h("nav", { className: "steps", "aria-label": "Lesson steps" },
+      STEP_NAMES.map(function (s, i) {
+        return h("button", { key: s, className: "step", "aria-current": props.step === i ? "step" : undefined,
+          onClick: function () { props.setStep(i); window.scrollTo({ top: 0 }); } },
+          h("span", { className: "n" }, i + 1), s);
+      }));
+  }
+
+  function Part1(props) {
+    var picks = {};
+    Object.keys(props.warm).forEach(function (k) { picks[k] = props.warm[k].last; });
+    var pick = props.onPick;
+    return h("section", null,
+      h("h2", null, "Who\u2019s on the other end"),
+      h("p", { className: "section-intro" }, "The whole gap between a low-skilled and a high-skilled adversary sits in the last four words of the first box: zero days. Copy both boxes into your notes."),
+      h("div", { className: "panel" },
+        h("div", { className: "ced" }, h("span", { className: "code" }, "1.3.A.1"),
+          "Adversaries can be classified by their skill levels.",
+          h("ul", null,
+            h("li", null, "Low-skilled adversaries rely on malicious cyber tools created by others that can be purchased online. The tools they use exploit known vulnerabilities."),
+            h("li", null, "High-skilled adversaries have the capacity to create new malicious cyber tools or modify existing ones to adapt to new defensive techniques and tools. They also have the capacity to discover undocumented vulnerabilities, known as zero days."))),
+        h("p", null, "A known vulnerability has a patch, or at least a name and a warning. A zero day has neither, because nobody defending it has found it yet. Buying a tool gets you the first. Finding the second is the job."),
+        h("h3", { style: { margin: "18px 0 4px" } }, "Quick sort: low skill or high skill?"),
+        SKILL_ITEMS.map(function (it) {
+          var p = picks[it.id];
+          return h("div", { className: "sort-item", key: it.id },
+            h("div", null, it.text),
+            h("div", { className: "choice-group", role: "group", "aria-label": "Skill level" },
+              ["Low", "High"].map(function (v) {
+                var cls = "chip" + (p === v ? (v === it.answer ? " right" : " wrong") : "");
+                return h("button", { key: v, className: cls, "aria-pressed": p === v, onClick: function () { pick(it.id, v); } }, v);
+              })),
+            p ? h("div", { className: "feedback " + (p === it.answer ? "right" : "wrong"), role: "status" },
+              (p === it.answer ? "Yes. " : "Not quite. ") + it.why) : null);
+        })),
+      h("div", { className: "panel" },
+        h("div", { className: "ced" }, h("span", { className: "code" }, "1.3.A.2"),
+          "Adversaries have a variety of motivations, including greed, desire for recognition, dedication to a cause, revenge, politics, or beliefs."),
+        h("p", null, "The exam will ask you to name the motivation that fits a situation. Pick the one the story actually supports, not the most dramatic one."),
+        MOTIVE_ITEMS.map(function (it) {
+          var p = picks[it.id];
+          return h("div", { className: "sort-item", key: it.id },
+            h("div", null, it.text),
+            h("div", { className: "chips-wrap", role: "group", "aria-label": "Motivation" },
+              MOTIVES.map(function (v) {
+                var cls = "chip" + (p === v ? (v === it.answer ? " right" : " wrong") : "");
+                return h("button", { key: v, className: cls, "aria-pressed": p === v, onClick: function () { pick(it.id, v); } }, v);
+              })),
+            p ? h("div", { className: "feedback " + (p === it.answer ? "right" : "wrong"), role: "status" },
+              p === it.answer ? "Yes. That\u2019s the one the story gives you evidence for." : "Look for the detail in the story that explains why this person acted. Try again.") : null);
+        })));
+  }
+
+  function Part2() {
+    var s = useState(0), active = s[0], setActive = s[1];
+    var a = ATTACKS[active];
+    return h("section", null,
+      h("h2", null, "The three wireless attacks"),
+      h("p", { className: "section-intro" }, "All three are in the College Board\u2019s words. Copy all three into your notes, then read what each one looks like in real life."),
+      h("div", { className: "tabs", role: "tablist" },
+        ATTACKS.map(function (x, i) {
+          return h("button", { key: x.id, id: "tab-" + x.id, role: "tab", className: "tab", "aria-selected": i === active,
+            "aria-controls": "panel-attack", onClick: function () { setActive(i); } }, x.name);
+        })),
+      h("div", { className: "panel attack-body", id: "panel-attack", role: "tabpanel", "aria-labelledby": "tab-" + a.id },
+        h("div", { className: "ced" }, h("span", { className: "code" }, a.code), a.ced),
+        h("p", { className: "attack-sub" }, a.sub),
+        h("ul", { className: "notes" }, a.notes.map(function (n) { return h("li", { key: n }, n); })),
+        active === 0 ? h("p", { className: "muted", style: { marginTop: 14 } },
+          "This is the one you can actually be caught by this week. The defense is small: read the network name before you tap it. An SSID is just text somebody typed, and your phone remembers names, not networks.") : null));
+  }
+
+  function countFilled(r) {
+    return Object.keys(r).filter(function (k) { return (r[k] || "").trim() !== ""; }).length;
+  }
+
+  function Incident(props) {
+    var n = props.n, r = props.r, inc = INCIDENTS[n - 1];
+    function set(k, v) { props.update("i" + n, k, v); }
+    var filled = countFilled(r);
+    var pre = "q" + n + "-";
+    return h("div", { className: "panel" },
+      h("div", { className: "incident-head" },
+        h("h3", null, "Incident " + n + ": " + inc.title),
+        h("span", { className: "done-tag" + (filled === 4 ? " full" : "") }, filled + " of 4 answered")),
+      h("p", { className: "scenario" }, inc.text),
+      h("div", { className: "field" },
+        h("label", { htmlFor: pre + "attack" }, QUESTIONS[0].text),
+        h("select", { id: pre + "attack", value: r.attack, onChange: function (e) { set("attack", e.target.value); } },
+          h("option", { value: "" }, "Choose one"),
+          ATTACKS.map(function (a) { return h("option", { key: a.id, value: a.name }, a.name); }))),
+      h("div", { className: "field" },
+        h("label", { htmlFor: pre + "detail" }, QUESTIONS[1].text),
+        h("textarea", { id: pre + "detail", value: r.detail, placeholder: "Quote or describe the clue from the incident.",
+          onChange: function (e) { set("detail", e.target.value); } })),
+      h("div", { className: "row2" },
+        h("div", { className: "field" },
+          h("label", { htmlFor: pre + "https" }, "Would HTTPS have helped?"),
+          h("select", { id: pre + "https", value: r.https, onChange: function (e) { set("https", e.target.value); } },
+            h("option", { value: "" }, "Choose one"),
+            h("option", { value: "Yes" }, "Yes"),
+            h("option", { value: "No" }, "No"))),
+        h("div", { className: "field" },
+          h("label", { htmlFor: pre + "why" }, QUESTIONS[3].text),
+          h("textarea", { id: pre + "why", value: r.httpsWhy, placeholder: "What would HTTPS protect here, or why wouldn\u2019t it matter?",
+            onChange: function (e) { set("httpsWhy", e.target.value); } }))));
+  }
+
+  function Part3(props) {
+    var resp = props.resp;
+    return h("section", null,
+      h("h2", null, "Three incidents"),
+      h("p", { className: "section-intro" }, "Work with your partner, but write your own answers. For each incident: name the attack, write the one detail that told you, and decide whether HTTPS would have helped."),
+      [1, 2, 3].map(function (n) { return h(Incident, { key: n, n: n, r: resp["i" + n], update: props.update }); }),
+      h("div", { className: "panel" },
+        h("h3", { style: { marginBottom: 8 } }, "Last one"),
+        h("div", { className: "field" },
+          h("label", { htmlFor: "final-which" }, FINAL_QUESTIONS[0].text),
+          h("select", { id: "final-which", value: resp.final.which, onChange: function (e) { props.update("final", "which", e.target.value); } },
+            h("option", { value: "" }, "Choose one"),
+            INCIDENTS.map(function (inc, i) {
+              var label = "Incident " + (i + 1) + ": " + inc.title;
+              return h("option", { key: i, value: label }, label);
+            }))),
+        h("div", { className: "field" },
+          h("label", { htmlFor: "final-why" }, "Say why."),
+          h("textarea", { id: "final-why", value: resp.final.why, onChange: function (e) { props.update("final", "why", e.target.value); } }))));
+  }
+
+  function Submit(props) {
+    var md = useMemo(function () { return buildMarkdown(props.name, props.period, props.resp, props.warm); }, [props.name, props.period, props.resp, props.warm]);
+    var s = useState(null), status = s[0], setStatus = s[1];
+    var missing = [];
+    if (!props.name.trim()) missing.push("Your name");
+    if (!props.period.trim()) missing.push("Your class period");
+    [1, 2, 3].forEach(function (n) {
+      var left = 4 - countFilled(props.resp["i" + n]);
+      if (left) missing.push("Incident " + n + ": " + left + " blank");
+    });
+    var fl = 2 - countFilled(props.resp.final);
+    if (fl) missing.push("Last question: " + fl + " blank");
+
+    function doCopy() {
+      copyText(md).then(function (ok) {
+        setStatus(ok ? { t: "Copied. Paste it where your teacher asked." }
+                     : { t: "Your browser blocked copying. Click in the box below, press Ctrl+A, then Ctrl+C.", warn: true });
+      });
+    }
+    function doDownload() {
+      try {
+        var blob = new Blob([md], { type: "text/markdown" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        var safe = (props.name.trim() || "student").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+        a.href = url; a.download = "1-3-wireless-" + safe + ".md";
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        setStatus({ t: "Downloaded " + a.download + "." });
+      } catch (e) {
+        setStatus({ t: "Download didn\u2019t work here. Use Copy instead.", warn: true });
+      }
+    }
+    return h("section", null,
+      h("h2", null, "Submit your analysis"),
+      h("p", { className: "section-intro" }, "Your answers save in this browser as you type. When you\u2019re done, copy the text and turn it in the way your teacher asked."),
+      h("div", { className: "panel" },
+        h("div", { className: "row2" },
+          h("div", { className: "field" },
+            h("label", { htmlFor: "stu-name" }, "Name"),
+            h("input", { id: "stu-name", type: "text", value: props.name, autoComplete: "name",
+              onChange: function (e) { props.setName(e.target.value); } })),
+          h("div", { className: "field" },
+            h("label", { htmlFor: "stu-period" }, "Period"),
+            h("input", { id: "stu-period", type: "text", value: props.period,
+              onChange: function (e) { props.setPeriod(e.target.value); } }))),
+        missing.length
+          ? h("div", null, h("strong", { style: { color: "var(--amber)" } }, "Still blank:"),
+              h("ul", { className: "missing" }, missing.map(function (m) { return h("li", { key: m }, m); })))
+          : h("p", { style: { color: "var(--cyan)" } }, "Everything is filled in."),
+        h("div", { className: "actions" },
+          h("button", { className: "btn primary", onClick: doCopy }, "Copy answers"),
+          h("button", { className: "btn", onClick: doDownload }, "Download .md"),
+          status ? h("span", { className: "status" + (status.warn ? " warn" : ""), role: "status" }, status.t) : null),
+        h("label", { htmlFor: "md-preview", className: "muted", style: { display: "block", marginBottom: 6 } }, "What you\u2019re turning in"),
+        h("textarea", { id: "md-preview", className: "preview", readOnly: true, value: md,
+          onFocus: function (e) { e.target.select(); } }),
+        h("div", { className: "actions" },
+          h("button", { className: "btn ghost", onClick: function () {
+            if (window.confirm("Erase all your answers on this computer? This can\u2019t be undone.")) props.reset();
+          } }, "Erase my answers"))));
+  }
+
+  function App() {
+    var saved = useMemo(loadSaved, []);
+    var st = useState(0), step = st[0], setStep = st[1];
+    var sn = useState(saved ? saved.name : ""), name = sn[0], setName = sn[1];
+    var sp = useState(saved ? saved.period : ""), period = sp[0], setPeriod = sp[1];
+    var sr = useState(saved ? saved.resp : blankResponses()), resp = sr[0], setResp = sr[1];
+    var sw = useState(loadWarm), warm = sw[0], setWarm = sw[1];
+
+    useEffect(function () {
+      try { localStorage.setItem(WARM_KEY, JSON.stringify(warm)); } catch (e) { /* storage unavailable */ }
+    }, [warm]);
+
+    /* The first click on each item is kept for good; later clicks only change what's shown. */
+    function recordPick(id, v) {
+      setWarm(function (prev) {
+        var next = Object.assign({}, prev);
+        var old = prev[id];
+        next[id] = old
+          ? { first: old.first, at: old.at, tries: old.tries + 1, last: v }
+          : { first: v, at: new Date().toISOString(), tries: 1, last: v };
+        return next;
+      });
+    }
+
+    useEffect(function () {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify({ name: name, period: period, resp: resp })); } catch (e) { /* storage unavailable */ }
+    }, [name, period, resp]);
+
+    function update(group, key, val) {
+      setResp(function (prev) {
+        var next = Object.assign({}, prev);
+        next[group] = Object.assign({}, prev[group]);
+        next[group][key] = val;
+        return next;
+      });
+    }
+    function reset() {
+      setResp(blankResponses()); setName(""); setPeriod("");
+      try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+    }
+    function go(i) { setStep(i); window.scrollTo({ top: 0 }); }
+
+    var body = [
+      h(Part1, { key: "p1", warm: warm, onPick: recordPick }),
+      h(Part2, { key: "p2" }),
+      h(Part3, { key: "p3", resp: resp, update: update }),
+      h(Submit, { key: "p4", name: name, period: period, setName: setName, setPeriod: setPeriod, resp: resp, warm: warm, reset: reset })
+    ][step];
+
+    return h("div", { className: "wrap" },
+      h("div", { className: "topbar" }, h("span", null, "AP Cybersecurity"), h("span", null, "Unit 1, Topic 1.3")),
+      h(Hero),
+      h(Steps, { step: step, setStep: setStep }),
+      h("main", null, body),
+      h("div", { className: "nav-foot" },
+        step > 0 ? h("button", { className: "btn", onClick: function () { go(step - 1); } }, "Back: " + STEP_NAMES[step - 1]) : h("span"),
+        step < 3 ? h("button", { className: "btn primary", onClick: function () { go(step + 1); } }, "Next: " + STEP_NAMES[step + 1]) : h("span")));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+})();
+</script>
+</body>
+</html>
