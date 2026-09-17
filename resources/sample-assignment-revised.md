@@ -1,6 +1,6 @@
 # Workplace Safety: Hazard Prioritization
 
-**Introduction to Auto Body Technology — 50 points**
+**Introduction to [Your CTE Program] — 50 points**
 
 **Due Friday. Submit through the class portal.**
 
