@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teaching apps you can build in one conversation</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --anchor:#2F6F8F; --signal:#E5920C; --hot:#A33A28;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0 0 60px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.55}
+.wrap{max-width:960px;margin:0 auto;padding:0 26px}
+header{background:var(--ink);color:var(--paper);padding:44px 0 38px;margin-bottom:34px}
+header h1{font-size:40px;margin:0 0 10px;letter-spacing:-1px;line-height:1.1}
+header p{margin:0;font-size:21px;color:#AEBDC9;max-width:66ch}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink-3);
+  margin:44px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--rule)}
+.lead{background:#fff;border:2px solid var(--rule);border-left:8px solid var(--signal);
+  border-radius:10px;padding:22px 26px;margin-bottom:10px}
+.lead h3{margin:0 0 8px;font-size:23px;letter-spacing:-.3px}
+.lead p{margin:0 0 14px;color:var(--ink-2)}
+pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;line-height:1.55;
+  background:var(--paper-2);border:2px solid var(--rule);border-radius:9px;padding:15px 17px;
+  margin:0;white-space:pre-wrap;overflow-wrap:break-word;color:var(--ink)}
+.copy{font:inherit;font-size:16px;font-weight:700;padding:8px 15px;margin-top:9px;
+  border:2px solid var(--ink-2);background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
+.copy:hover{background:var(--paper-2)}
+.copy.done{background:#E2F1EA;border-color:#2E7D5B;color:#2E7D5B}
+mark{background:#FDE3AE;padding:1px 3px;border-radius:3px;font-weight:700}
+.demo{background:#fff;border:2px solid var(--rule);border-radius:12px;padding:22px 26px;margin-bottom:16px}
+.dept{display:inline-block;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  color:#fff;background:var(--anchor);padding:4px 10px;border-radius:5px;margin-bottom:9px}
+.demo h3{margin:0 0 6px;font-size:26px;letter-spacing:-.4px}
+.demo h3 a{color:var(--ink);text-decoration:none;border-bottom:3px solid var(--signal)}
+.demo h3 a:hover{color:var(--anchor)}
+.demo .what{margin:0 0 16px;color:var(--ink-2)}
+.demo details{margin-top:4px}
+.demo summary{cursor:pointer;font-size:17px;font-weight:700;color:var(--anchor);
+  padding:6px 0;list-style:revert}
+.demo summary:hover{color:var(--ink)}
+.demo details pre{margin-top:9px}
+.open{display:inline-block;font-size:18px;font-weight:700;padding:10px 18px;border-radius:9px;
+  background:var(--ink);color:var(--paper);text-decoration:none;margin-bottom:14px}
+.open:hover{background:var(--anchor)}
+.priv{background:#FBF0EE;border:2px solid var(--hot);border-radius:10px;padding:20px 24px}
+.priv h3{margin:0 0 8px;font-size:23px;color:var(--hot);letter-spacing:-.3px}
+.priv p{margin:0 0 10px;color:var(--ink-2)}
+.priv p:last-child{margin:0}
+footer{margin-top:44px;padding-top:20px;border-top:2px solid var(--rule);
+  font-size:17px;color:var(--ink-3)}
+footer a{color:var(--anchor)}
+b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>Five small apps, each built in one conversation.</h1>
+  <p>Every one of these teaches a thing students reliably get stuck on &mdash; the kind of thing where a
+  diagram in a textbook cannot help, because the concept only exists in what changes when you move something.
+  No installs. No accounts. The prompt that makes each one is right here.</p>
+</div></header>
+
+<div class="wrap">
+
+  <h2>Start here &mdash; the only part worth memorising</h2>
+  <div class="lead">
+    <h3>Paste this into Claude and fill in the blank.</h3>
+    <p>The load-bearing phrase is <mark>ask me one question at a time</mark>. That clause is what turns a
+    one-shot request into a conversation, and a conversation is the difference between an app that
+    matches your class and an app that matches the internet&rsquo;s average class.</p>
+    <pre id="masterPrompt">I want to build a small interactive web app that helps my students understand
+[CONCEPT]. Before you build anything, interview me: ask me one question at a
+time about what my students already believe about this, where they get stuck,
+what they should be able to do differently after using it, and how much class
+time they'll have with it. Keep asking follow-up questions until you could
+describe the finished app back to me and I'd say "yes, that's it." Then build
+it as a single interactive artifact.</pre>
+    <button class="copy" data-for="masterPrompt">Copy this prompt</button>
+  </div>
+
+  <h2>The demos</h2>
+
+  <div class="demo">
+    <span class="dept">Sports medicine &middot; kinesiology</span>
+    <h3><a href="demos/muscle-contraction-types.html">Concentric, eccentric, isometric</a></h3>
+    <p class="what">A still photo of an arm at 90&deg; is pixel-identical whether the athlete is lifting or
+    lowering &mdash; so a textbook physically cannot show the difference. Drag the forearm and the label
+    flips, while the force bar stays high on the way down. That lowering half is where the soreness and
+    most hamstring and Achilles injuries come from.</p>
+    <a class="open" href="demos/muscle-contraction-types.html">Open the demo &rarr;</a>
+    <details><summary>The prompt that made it</summary>
+      <pre id="p1">I want to build a small interactive web app that helps my students understand
+the difference between concentric, eccentric, and isometric contractions.
+Before you build anything, interview me: ask me one question at a time about
+what my students already believe about this, where they get stuck, what they
+should be able to do differently after using it, and how much class time
+they'll have with it. Keep asking follow-up questions until you could describe
+the finished app back to me and I'd say "yes, that's it." Then build it as a
+single interactive artifact.</pre>
+      <button class="copy" data-for="p1">Copy</button>
+    </details>
+  </div>
+
+  <div class="demo">
+    <span class="dept">Math &middot; physics</span>
+    <h3><a href="demos/function-transformations.html">Why f(x + 3) moves the graph left</a></h3>
+    <p class="what">Plus means right everywhere else in a student&rsquo;s life, so this one is
+    near-universally reported as counterintuitive. Drag the input dot and watch the arrow travel
+    <em>into</em> the parentheses, land somewhere else on the parent function, and come back up.
+    The graph moved left because the input got sent right.</p>
+    <a class="open" href="demos/function-transformations.html">Open the demo &rarr;</a>
+    <details><summary>The prompt that made it</summary>
+      <pre id="p2">I want to build a small interactive web app that helps my students understand
+why f(x + 3) shifts a graph left instead of right. Before you build anything,
+interview me: ask me one question at a time about what my students already
+believe about this, where they get stuck, what they should be able to do
+differently after using it, and how much class time they'll have with it. Keep
+asking follow-up questions until you could describe the finished app back to me
+and I'd say "yes, that's it." Then build it as a single interactive artifact.</pre>
+      <button class="copy" data-for="p2">Copy</button>
+    </details>
+  </div>
+
+  <div class="demo">
+    <span class="dept">Social studies &middot; economics</span>
+    <h3><a href="demos/supply-demand-shift-vs-movement.html">Did the curve move, or did you move along it?</a></h3>
+    <p class="what">The textbook prints the finished picture with D and D&prime; both already drawn, so there
+    is no before and after &mdash; and cause-versus-effect <em>is</em> the order. Pick a shock, commit to a
+    prediction, then watch the equilibrium slide along the curve that never moved.</p>
+    <a class="open" href="demos/supply-demand-shift-vs-movement.html">Open the demo &rarr;</a>
+    <details><summary>The prompt that made it</summary>
+      <pre id="p3">I want to build a small interactive web app that helps my students understand
+the difference between a shift of the demand curve and a movement along it.
+Before you build anything, interview me: ask me one question at a time about
+what my students already believe about this, where they get stuck, what they
+should be able to do differently after using it, and how much class time
+they'll have with it. Keep asking follow-up questions until you could describe
+the finished app back to me and I'd say "yes, that's it." Then build it as a
+single interactive artifact.</pre>
+      <button class="copy" data-for="p3">Copy</button>
+    </details>
+  </div>
+
+  <div class="demo">
+    <span class="dept">World language &middot; Spanish</span>
+    <h3><a href="demos/ser-vs-estar.html">Ser vs. estar &mdash; the rule they were taught is the misconception</a></h3>
+    <p class="what">&ldquo;Ser is permanent, estar is temporary&rdquo; is wrong often enough that students who
+    obey it get marked down. Flip one verb and the English flips with it &mdash; <em>Ana is boring</em> becomes
+    <em>Ana is bored</em>. Then press the test button and watch the rule break on <em>est&aacute; muerto</em>.</p>
+    <a class="open" href="demos/ser-vs-estar.html">Open the demo &rarr;</a>
+    <details><summary>The prompt that made it</summary>
+      <pre id="p4">I want to build a small interactive web app that helps my students understand
+when to use ser and when to use estar in Spanish. Before you build anything,
+interview me: ask me one question at a time about what my students already
+believe about this, where they get stuck, what they should be able to do
+differently after using it, and how much class time they'll have with it. Keep
+asking follow-up questions until you could describe the finished app back to me
+and I'd say "yes, that's it." Then build it as a single interactive artifact.</pre>
+      <button class="copy" data-for="p4">Copy</button>
+    </details>
+  </div>
+
+  <div class="demo">
+    <span class="dept">Any subject &middot; about the tool itself</span>
+    <h3><a href="resources/context-window-drift.html">Context isn&rsquo;t a bucket</a></h3>
+    <p class="what">Why a long chat starts drifting, forgetting your instructions and contradicting itself &mdash;
+    and what to do about it. This is the one to open when a colleague tells you the AI &ldquo;got worse
+    halfway through.&rdquo; Built in August 2026 for the conference workshop in this same repo.</p>
+    <a class="open" href="resources/context-window-drift.html">Open the demo &rarr;</a>
+    <details><summary>The prompt I would use to rebuild it today</summary>
+      <pre id="p5">I want to build a small interactive web app that helps my students understand
+how an AI model's context window works and why long conversations drift. Before
+you build anything, interview me: ask me one question at a time about what my
+students already believe about this, where they get stuck, what they should be
+able to do differently after using it, and how much class time they'll have
+with it. Keep asking follow-up questions until you could describe the finished
+app back to me and I'd say "yes, that's it." Then build it as a single
+interactive artifact.</pre>
+      <button class="copy" data-for="p5">Copy</button>
+      <p style="font-size:17px;color:#6B7C8C;margin:10px 0 0">Honest note: this one predates the prompt above.
+      It came out of a longer, messier conversation. The prompt is what I would use now.</p>
+    </details>
+  </div>
+
+  <h2>One rule, and it is not optional</h2>
+  <div class="priv">
+    <h3>Never paste student names or identifiers.</h3>
+    <p>Every demo on this page contains <b>zero student data</b>. Every name, score and record in them is
+    invented. These files are public and they stay public.</p>
+    <p>It is not just names. In a school of 900, &ldquo;the student who moved here from Guam in October&rdquo;
+    identifies a specific kid just as precisely as a name does. So do IEP details, medical details,
+    discipline dates, and filenames like <code>smith_jordan_essay.docx</code>. Strip the narrative details,
+    not only the proper nouns.</p>
+    <p>The vendor&rsquo;s terms and <em>your authorisation</em> are two different gates, and only your district
+    can open the second one. The long version, including an email you can send your technology director on
+    Monday, is in <a href="README.md#student-privacy">the workshop README</a>.</p>
+  </div>
+
+  <footer>
+    <p>Built by Eric Ogden for a Rigby High School staff meeting, 17 September 2026.
+    The full conference workshop these grew out of &mdash; including the two-gates privacy material and a
+    click-by-click walkthrough &mdash; lives in
+    <a href="README.md">README.md</a> and <a href="WALKTHROUGH.md">WALKTHROUGH.md</a> in this repository.</p>
+    <p><a href="deck.html">The slides from the talk</a> are themselves one of these artifacts.</p>
+  </footer>
+</div>
+
+<script>
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest && ev.target.closest('.copy');
+  if(!b) return;
+  var txt=document.getElementById(b.dataset.for).textContent;
+  var done=function(){
+    var old=b.textContent;
+    b.textContent='Copied'; b.classList.add('done');
+    setTimeout(function(){ b.textContent=old; b.classList.remove('done'); },1600);
+  };
+  // Clipboard API is blocked in some file:// contexts, so keep the execCommand path as the fallback.
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done,function(){ legacy(txt,done); });
+  } else { legacy(txt,done); }
+});
+function legacy(txt,done){
+  var ta=document.createElement('textarea');
+  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ ta.select(); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
