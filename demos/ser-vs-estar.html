@@ -100,13 +100,20 @@ get marked down. <b>Flip the verb</b> and watch the English change &mdash; then 
      tag:'RIGHT ANSWER, WRONG REASON', ok:'warn',
      why:'The rule happens to pick correctly here, which is exactly why it survives. But notice: <b>Ana es aburrida</b> can be true for one bad summer, and <b>Ana está aburrida</b> can last her whole sophomore year. Duration was never the variable. The rule is right by accident and it teaches the wrong mechanism.'},
 
-    {subj:'Mi abuelo', adj:'muerto',
+    {subj:'Madrid', adj:'en España',
      ser:{bad:true, v:'es', en:'Spanish speakers do not say this.',
-          mean:'There is no reading of this sentence. It is simply not said, however permanent the condition is.'},
-     estar:{v:'está', en:'My grandfather is dead.', mean:'A state he arrived in. Spanish treats death as a condition he is in, not a category he belongs to.',
-            cmp:'Compared to being alive — the state he was in before.'},
+          mean:'Where a place sits is never said with ser, however permanent it is. There is no reading of this sentence.'},
+     estar:{v:'está', en:'Madrid is in Spain.',
+            mean:'Where something is located. Position is a state a thing is in, not a category it belongs to — so it takes estar, and it keeps taking estar for a thousand years.'},
      tag:'THE RULE BREAKS', ok:'fail',
-     why:'Death is the most permanent condition that exists. The rule predicts <b>ser</b>. Spanish uses <b>estar</b>, and <em>only</em> estar. This is not an exception to be memorised at the edge &mdash; it is the rule failing at its own strongest case.'},
+     why:'Madrid has not moved since the ninth century. If anything is permanent, it is where a capital city sits &mdash; and Spanish uses <b>estar</b> anyway, with no option to use ser. Then look at the very next card, where a party that lasts four hours takes <b>ser</b>. Permanence predicts neither one.'},
+
+    {subj:'La fiesta', adj:'en mi casa',
+     ser:{v:'es', en:'The party is at my house.', mean:'Correct, and it is ser. An event does not sit in a place — it happens in a place, and Spanish marks that with ser.'},
+     estar:{bad:true, v:'está', en:'Spanish speakers do not say this.',
+            mean:'Wrong verb for an event. Estar would be right for my house — Mi casa está en la calle Mayor — but not for the party happening in it.'},
+     tag:'THE RULE BREAKS', ok:'fail',
+     why:'The back-up rule everyone reaches for is &ldquo;location is always estar.&rdquo; A party&rsquo;s location lasts four hours &mdash; about as temporary as anything gets &mdash; and Spanish still demands <b>ser</b>. Events take ser for where they happen. Objects take estar for where they sit.'},
 
     {subj:'La manzana', adj:'verde',
      ser:{v:'es', en:'The apple is green.', mean:'Green is what kind of apple it is — a Granny Smith. The variety.'},
@@ -122,19 +129,12 @@ get marked down. <b>Flip the verb</b> and watch the English change &mdash; then 
      tag:'THE RULE WORKS', ok:'pass',
      why:'Clever is durable, ready is momentary, and the rule lands cleanly. <b>This is why the rule is still taught.</b> It works often enough to feel reliable, which is precisely what makes a student confident and wrong on the next card.'},
 
-    {subj:'La fiesta', adj:'en mi casa',
-     ser:{v:'es', en:'The party is at my house.', mean:'Correct, and it is ser. An event does not sit in a place — it happens in a place, and Spanish marks that with ser.'},
-     estar:{bad:true, v:'está', en:'Spanish speakers do not say this.',
-            mean:'Wrong verb for an event. Estar would be right for my house — Mi casa está en la calle Mayor — but not for the party happening in it.'},
-     tag:'THE RULE BREAKS', ok:'fail',
-     why:'The back-up rule everyone reaches for is &ldquo;location is always estar.&rdquo; A party&rsquo;s location lasts four hours &mdash; about as temporary as anything gets &mdash; and Spanish still demands <b>ser</b>. Events take ser for where they happen. Objects take estar for where they sit.'},
-
     {subj:'Pedro', adj:'vivo',
      ser:{v:'es', en:'Pedro is sharp.', mean:'Quick, streetwise, hard to fool. A character trait.'},
      estar:{v:'está', en:'Pedro is alive.', mean:'A state Pedro is in — the one that ends.',
             cmp:'Compared to the alternative.'},
      tag:'THE RULE BREAKS', ok:'fail',
-     why:'Put this next to <b>está muerto</b>. Alive takes estar. Dead takes estar. The permanent/temporary rule has now failed at both ends of a human life, while <b>ser</b> quietly handles a personality trait that could change next year.'},
+     why:'Nobody would call being alive a temporary condition, and Spanish uses <b>estar</b> for it anyway &mdash; while <b>ser</b> quietly handles a personality trait that could change by next year. The verb is not tracking how long anything lasts. It is tracking whether you are naming a <b>category</b> (Pedro is a sharp person) or a <b>state he is in</b>.'},
 
     {subj:'La sopa', adj:'rica',
      ser:{v:'es', en:'Soup is delicious.', mean:'A claim about soup as a category of food — the kind of thing soup is.'},
@@ -177,7 +177,7 @@ get marked down. <b>Flip the verb</b> and watch the English change &mdash; then 
      estar:{v:'está', en:'The door is closed.', mean:'A result. Something closed it, and it is now in that condition.',
             cmp:'Compared to open — the state it was in before someone closed it.'},
      tag:'THE RULE BREAKS', ok:'fail',
-     why:'A closed door can stay closed for a century and it is still <b>estar</b>. Closed is a <b>result of a change</b>, not a category of door. Results take estar no matter how long they last &mdash; which is the same reason <b>muerto</b> takes estar.'}
+     why:'A closed door can stay closed for a century and it is still <b>estar</b>. Closed is a <b>result of a change</b>, not a category of door. Results take estar no matter how long they last &mdash; because the verb is tracking what kind of claim you are making, not how long it will stay true.'}
   ];
 
   var TAGCOL={fail:'#A33A28', warn:'#E5920C', pass:'#2E7D5B'};
