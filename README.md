@@ -209,7 +209,8 @@ saved in the file. The Verb is the only thing you type.
 2. **Monday (2 min)** — send the district email above.
 3. **Monday, with your kids (0 prep)** — put **Verb · Format · Voice · Context** on the board. One assignment. You don't need a policy or a district rollout to start.
 4. **When you have a couple of hours** — [**AI Fluency for PK-12 Educators**](https://anthropic.skilljar.com/path/ai-fluency-for-pk-12-educators). Free, from Anthropic. The 4D framework taught properly — it picks up exactly where the four parts leave off.
-5. **When something annoys you twice** — that's a Skill. Write it down.
+5. **Next time you sit down with it** — keep the **[prompting cheat sheet](resources/prompting-cheat-sheet.md)** open. Make it interview you before it builds anything.
+6. **When something annoys you twice** — that's a Skill. Write it down.
 
 ---
 
