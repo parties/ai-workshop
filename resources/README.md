@@ -8,7 +8,7 @@ as-is.
 | [`framework.md`](framework.md) | The four-part prompt framework — Verb, Format, Voice, Context. Full version with examples and rollout plan. | **Upload it** to your Project / Gem / Custom GPT. It's also worth reading yourself. |
 | [`sample-assignment.md`](sample-assignment.md) | A deliberately AI-vulnerable CTE assignment. | **Attach it** if you didn't bring one of your own. |
 | [`sample-assignment-revised.md`](sample-assignment-revised.md) | The revised, framework-ified assignment that integrates AI. | Use it as a reference for what an assignment that incorporates AI looks like.
-| [`prompting-cheat-sheet.md`](prompting-cheat-sheet.md) | Copy-paste prompts for everything after the first one: make it interview you, show you first, stop over-talking, build real documents. | **Keep it open** in a tab while you work. Start with the fix-it table at the top. |
+| [`prompting-cheat-sheet.md`](prompting-cheat-sheet.md) | Copy-paste prompts for everything after the first one: make it interview you, show you first, stop over-talking, build real documents. | **Keep it open** in a tab while you work. Start with the fix-it table at the top. Prefer copy buttons or a printout? Use the [web version](https://parties.github.io/ai-workshop/resources/prompting-cheat-sheet.html). |
 
 Prompts live in [`../prompts/`](../prompts/).
 

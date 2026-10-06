@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompting Cheat Sheet</title>
+<style>
+:root{
+  --ink:#16202B; --ink-2:#3A4A5A; --ink-3:#6B7C8C;
+  --paper:#E8EDF1; --paper-2:#F3F6F8; --rule:#C3CFD9;
+  --anchor:#2F6F8F; --signal:#E5920C; --hot:#A33A28;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0 0 60px;background:var(--paper);color:var(--ink);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:19px;line-height:1.55}
+.wrap{max-width:960px;margin:0 auto;padding:0 26px}
+header{background:var(--ink);color:var(--paper);padding:44px 0 38px;margin-bottom:34px}
+header h1{font-size:40px;margin:0 0 10px;letter-spacing:-1px;line-height:1.1}
+header p{margin:0 0 10px;font-size:21px;color:#AEBDC9;max-width:66ch}
+header p:last-child{margin:0}
+header strong{color:var(--paper)}
+header code{background:#2A3846;color:var(--paper);padding:1px 6px;border-radius:4px;font-size:.9em}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink-3);
+  margin:44px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--rule)}
+h3{font-size:24px;letter-spacing:-.3px;margin:30px 0 8px;padding-left:12px;border-left:6px solid var(--signal)}
+p{margin:0 0 14px;color:var(--ink-2)}
+a{color:var(--anchor)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em;
+  background:var(--paper-2);padding:1px 5px;border-radius:4px}
+.snip{margin:0 0 18px}
+pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;line-height:1.55;
+  background:#fff;border:2px solid var(--rule);border-radius:9px;padding:15px 17px;
+  margin:0;white-space:pre-wrap;overflow-wrap:break-word;color:var(--ink)}
+.copy{font:inherit;font-size:16px;font-weight:700;padding:8px 15px;margin-top:9px;
+  border:2px solid var(--ink-2);background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
+.copy:hover{background:var(--paper-2)}
+.copy.done{background:#E2F1EA;border-color:#2E7D5B;color:#2E7D5B}
+table{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--rule);
+  border-radius:10px;overflow:hidden;margin:0 0 18px;font-size:17px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--rule)}
+th{background:var(--paper-2);font-size:14px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-3)}
+tr:last-child td{border-bottom:0}
+td a{text-decoration:none;font-weight:700}
+footer{margin-top:44px;padding-top:20px;border-top:2px solid var(--rule);
+  font-size:17px;color:var(--ink-3)}
+footer p{color:var(--ink-3)}
+@media (max-width:600px){
+  body{font-size:17px}
+  header h1{font-size:32px}
+  header p{font-size:18px}
+  table{font-size:15px}
+  th,td{padding:8px 9px}
+}
+@media print{
+  @page{margin:.5in .55in}
+  body{background:#fff;font-size:9.5pt;line-height:1.4;padding:0}
+  .wrap{max-width:none;padding:0}
+  header{background:none;color:var(--ink);padding:0 0 6px;margin-bottom:6px;border-bottom:2px solid var(--ink)}
+  header h1{font-size:18pt;margin:0 0 4px}
+  header p{color:var(--ink-2);font-size:9.5pt;margin:0 0 4px}
+  header strong{color:var(--ink)}
+  .copy,th:last-child,td:last-child{display:none}
+  p{margin:0 0 6px}
+  h2{font-size:9pt;margin:12px 0 4px;padding-bottom:3px;break-after:avoid}
+  h3{font-size:11pt;margin:10px 0 3px;border-left-width:4px;padding-left:8px;break-after:avoid}
+  .snip{margin:0 0 6px}
+  pre{font-size:8.5pt;line-height:1.4;padding:5px 8px;border-width:1px;border-radius:5px}
+  .snip,tr{break-inside:avoid}
+  table{font-size:9pt;border-width:1px;margin:0 0 8px}
+  th,td{padding:4px 8px}
+  footer{margin-top:12px;padding-top:6px;font-size:8.5pt}
+  footer p:last-child{display:none}
+  a{color:var(--ink);text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Prompting Cheat Sheet</h1>
+    <p>The four parts get your first prompt right. This page is for everything after it: the
+back-and-forth that turns a decent first answer into something you'd actually hand to students.</p>
+<p>Everything in a box is meant to be copied as-is. Click <strong>Copy</strong> under it. Swap out anything in <code>[BRACKETS]</code>.</p>
+  </div>
+</header>
+<main class="wrap">
+<h2 id="the-fix-it-table">The fix-it table</h2>
+<table>
+<thead>
+<tr>
+<th>If it…</th>
+<th>Say…</th>
+<th>More</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Starts building before it understands what you want</td>
+<td><em>"Before you start, interview me one question at a time."</em></td>
+<td><a href="#make-it-interview-you">↓</a></td>
+</tr>
+<tr>
+<td>Builds the wrong thing and you've wasted twenty minutes</td>
+<td><em>"Show me an outline first and wait for my OK."</em></td>
+<td><a href="#make-it-show-you-first">↓</a></td>
+</tr>
+<tr>
+<td>Asks you questions one at a time, forever</td>
+<td><em>"Put all your questions in one numbered list with your recommended answer for each."</em></td>
+<td><a href="#get-all-its-questions-at-once">↓</a></td>
+</tr>
+<tr>
+<td>Gives you options but no opinion</td>
+<td><em>"What would you do, and why?"</em></td>
+<td><a href="#ask-what-it-thinks">↓</a></td>
+</tr>
+<tr>
+<td>Writes four paragraphs when you needed one</td>
+<td><em>"Be brief."</em></td>
+<td><a href="#when-it-talks-too-much">↓</a></td>
+</tr>
+<tr>
+<td>Ignores the one thing you said mattered</td>
+<td><em>"That still does X, which is what I'm trying to avoid."</em></td>
+<td><a href="#when-it-missed-the-point">↓</a></td>
+</tr>
+<tr>
+<td>Can't fix a problem you keep describing</td>
+<td>Paste or screenshot the actual problem.</td>
+<td><a href="#show-it-dont-describe-it">↓</a></td>
+</tr>
+<tr>
+<td>Sounds like a brochure</td>
+<td><em>"This sounds like AI. Rewrite it like a teacher talking to a colleague."</em></td>
+<td><a href="#when-it-sounds-like-ai">↓</a></td>
+</tr>
+<tr>
+<td>Lost you three messages ago</td>
+<td><em>"I don't follow. Re-explain with more context and no jargon."</em></td>
+<td><a href="#when-you-cant-follow-it">↓</a></td>
+</tr>
+<tr>
+<td>Reprints the whole document every time you change one line</td>
+<td><em>"Put this in a document and edit it there."</em></td>
+<td><a href="#asking-for-a-document">↓</a></td>
+</tr>
+<tr>
+<td>Forgets things you told it earlier</td>
+<td>Start a new chat with a summary.</td>
+<td><a href="#when-a-long-chat-goes-sideways">↓</a></td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="1-before-it-builds-anything">1. Before it builds anything</h2>
+<h3 id="make-it-interview-you">Make it interview you</h3>
+<p>The single biggest upgrade. Most bad output comes from the AI guessing at things you never said.
+Make it ask instead.</p>
+<p>Three sizes, from quick to thorough.</p>
+<p><strong>One line</strong>, for quick stuff: an email, a single handout.</p>
+<div class="snip"><pre id="p1">Before you start, interview me one question at a time until you understand what I need.</pre><button class="copy" data-for="p1">Copy</button></div>
+<p><strong>A paragraph</strong>, for something your students will use this week.</p>
+<div class="snip"><pre id="p2">I want to make [WHAT YOU'RE MAKING]. Before you make anything, interview me. Ask me one question at a time about who it's for, what they already know, what it needs to accomplish, and any limits I'm working with (time, length, format). Keep asking follow-up questions until you could describe the finished thing back to me and I'd say &quot;yes, that's it.&quot; Then describe it back to me and wait for my OK.</pre><button class="copy" data-for="p2">Copy</button></div>
+<p><strong>The full grilling</strong>, for anything you'll live with for a semester: a unit, a syllabus, a
+project and its rubric.</p>
+<div class="snip"><pre id="p3">I want to make [WHAT YOU'RE MAKING] for [WHO IT'S FOR]. Don't make anything yet. First, interview me until we agree on exactly what it should be.
+
+How to run the interview:
+- Treat this as a decision tree. Every answer I give opens up new decisions. Only ask about decisions I can make right now. Save any question that depends on an answer you haven't heard yet.
+- Ask 1 to 3 questions per round, never more.
+- Make every question multiple choice: options A, B, C, plus &quot;something else.&quot; Put the option you'd recommend first and tell me why in one line.
+- I'll answer like this: 1A, 2C, 3 something else: [my answer].
+- Don't ask me anything you could figure out from what I've already told you.
+- If one of my answers contradicts an earlier one, point it out before moving on.
+- Keep going until every branch is settled. Then give me a numbered summary of every decision we made and wait for my OK before you make anything.</pre><button class="copy" data-for="p3">Copy</button></div>
+<p>Why the full version works: multiple choice with a recommendation means you're reacting, not
+inventing. Answering "1A, 2C" takes five seconds. Typing a paragraph for every question is how
+interviews get abandoned halfway.</p>
+<h3 id="make-it-show-you-first">Make it show you first</h3>
+<p>Fixing an outline costs one message. Fixing a finished unit costs an afternoon.</p>
+<div class="snip"><pre id="p4">Before you make anything, show me a short outline of what you'll build (sections, length, format) and list any assumptions you're making. Wait for my OK.</pre><button class="copy" data-for="p4">Copy</button></div>
+<p>The assumptions list is the useful part. That's where you find out it thought your class was
+55 minutes, not 90.</p>
+<h3 id="get-all-its-questions-at-once">Get all its questions at once</h3>
+<p>The opposite of the interview, for when you'd rather answer everything in one go.</p>
+<div class="snip"><pre id="p5">If you have questions before you start, put them all in one numbered list with your recommended answer for each. I'll reply by number.</pre><button class="copy" data-for="p5">Copy</button></div>
+<p>Then reply like this: <em>"1 yes, 2 B, 3 through 7 go with your picks."</em> One round instead of
+twenty, and it has to commit to an opinion on every question.</p>
+<h3 id="ask-what-it-thinks">Ask what it thinks</h3>
+<p>It will happily give you three options and no opinion. Make it pick.</p>
+<div class="snip"><pre id="p6">What would you do, and why?</pre><button class="copy" data-for="p6">Copy</button></div>
+<p>Also good: <em>"Which of these would you cut?"</em> and <em>"What's the weakest part of this?"</em> Treat it
+like a colleague with a view, not a typist.</p>
+
+<h2 id="2-while-its-working">2. While it's working</h2>
+<h3 id="when-it-talks-too-much">When it talks too much</h3>
+<p>Go up the ladder until it behaves:</p>
+<div class="snip"><pre id="p7">Be brief.</pre><button class="copy" data-for="p7">Copy</button></div>
+<div class="snip"><pre id="p8">Three bullets max.</pre><button class="copy" data-for="p8">Copy</button></div>
+<div class="snip"><pre id="p9">No intro, no recap, no &quot;let me know if you'd like…&quot; at the end.</pre><button class="copy" data-for="p9">Copy</button></div>
+<div class="snip"><pre id="p10">For the rest of this chat, keep every answer under 100 words unless I ask for more.</pre><button class="copy" data-for="p10">Copy</button></div>
+<p>Tired of typing it every time? Put the last one in your <strong>Project / Gem / Custom GPT
+instructions</strong> and never say it again. That's <a href="https://github.com/parties/ai-workshop/blob/main/README.md#the-idea">the whole point of the workshop</a>.</p>
+<h3 id="when-it-missed-the-point">When it missed the point</h3>
+<p>Don't just say "try again." Say what it missed and why it matters, then ask for options:</p>
+<div class="snip"><pre id="p11">That still [WHAT IT'S STILL DOING], which is what I'm trying to avoid. Give me five other ideas and I'll pick one.</pre><button class="copy" data-for="p11">Copy</button></div>
+<p>Restating your limit fixes this answer. Asking for five fixes the next one too, because you're
+choosing instead of hoping.</p>
+<h3 id="show-it-dont-describe-it">Show it, don't describe it</h3>
+<p><em>"The table looks weird"</em> gets you a guess. Pasting the table gets you a fix.</p>
+<p>Paste the actual output that's wrong. Screenshot the thing that looks off. If the problem is what
+students turned in, paste an example, <strong>with the name removed</strong>. See
+<a href="https://github.com/parties/ai-workshop/blob/main/README.md#student-privacy">Student privacy</a>.</p>
+<h3 id="when-it-sounds-like-ai">When it sounds like AI</h3>
+<p>Say what's wrong and what you want instead. "Make it better" gives it nothing to work with.</p>
+<div class="snip"><pre id="p12">This sounds like AI: too generic, too upbeat. Rewrite it like a teacher explaining this to a colleague.</pre><button class="copy" data-for="p12">Copy</button></div>
+<p>Swap in your own complaint. <em>Too salesy, too formal, too many dashes, reads like a press
+release.</em> The more specific, the better the rewrite.</p>
+<h3 id="when-you-cant-follow-it">When you can't follow it</h3>
+<p>Its job is to make sense to you, not the other way around.</p>
+<div class="snip"><pre id="p13">I don't follow. Re-explain that with more context and no jargon.</pre><button class="copy" data-for="p13">Copy</button></div>
+
+<h2 id="3-documents-youll-keep">3. Documents you'll keep</h2>
+<h3 id="asking-for-a-document">Asking for a document</h3>
+<p>By default it answers in the chat, which means every change reprints the whole thing and the
+version you want is buried twelve messages up. Ask for a document instead:</p>
+<div class="snip"><pre id="p14">Put this in a document, not the chat. When I ask for changes, edit the document. Don't reprint it.</pre><button class="copy" data-for="p14">Copy</button></div>
+<p>Each platform calls the document something different. In Claude it's an <strong>Artifact</strong>, and in
+ChatGPT and Gemini it's a <strong>Canvas</strong>. Same idea in all three: a separate pane you can keep
+editing.</p>
+<p>To get it out, use the copy or download button on the document. If you'll paste it into Google
+Docs, ask for it in <strong>Markdown</strong>, then use <strong>Edit → Paste from Markdown</strong> in Docs. You may have
+to turn on Markdown in <strong>Tools → Preferences</strong> first. UIs move. Look for the word "Markdown."</p>
+<h3 id="bigger-document-more-steps-first">Bigger document, more steps first</h3>
+<p>The bigger the document, the more you settle before it writes anything.</p>
+<table>
+<thead>
+<tr>
+<th>Making a…</th>
+<th>Do this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lesson plan</strong></td>
+<td>One good <a href="https://github.com/parties/ai-workshop/blob/main/README.md#the-four-parts">four-part prompt</a>, then <a href="#make-it-show-you-first">show me first</a>.</td>
+</tr>
+<tr>
+<td><strong>Unit outline</strong></td>
+<td><a href="#make-it-interview-you">Paragraph interview</a>, then an outline, then approve it, then fill it in <strong>one lesson at a time</strong>.</td>
+</tr>
+<tr>
+<td><strong>Syllabus</strong></td>
+<td><a href="#make-it-interview-you">Full grilling</a>, then paste your district or department requirements, then build it <strong>one section at a time</strong>, then run the check below.</td>
+</tr>
+</tbody>
+</table>
+<p>The check at the end of a syllabus:</p>
+<div class="snip"><pre id="p15">Go through the requirements I pasted, one by one, and tell me which ones this document doesn't meet yet.</pre><button class="copy" data-for="p15">Copy</button></div>
+<p>Why one section at a time: a long chat isn't a bucket that holds everything you poured in. The
+AI pays less attention to things the further back they are, and a whole syllabus in one shot
+is where it starts quietly dropping your requirements. The details are in
+<a href="context-window-drift.html">how context windows actually work</a>.</p>
+
+<h2 id="4-before-you-use-it">4. Before you use it</h2>
+<h3 id="what-am-i-missing">What am I missing</h3>
+<div class="snip"><pre id="p16">What am I not thinking of here? Rank it by what would cause the most trouble.</pre><button class="copy" data-for="p16">Copy</button></div>
+<p>It won't catch everything. It will catch the thing you'd have found out about in second period.</p>
+<h3 id="quiz-me">Quiz me</h3>
+<p>It just helped you write material you're about to teach. Make sure you know it cold.</p>
+<div class="snip"><pre id="p17">Quiz me on this before I teach it. One question at a time, and don't tell me the answer until I've tried.</pre><button class="copy" data-for="p17">Copy</button></div>
+<h3 id="check-it-against-your-list">Check it against your list</h3>
+<p>Tell it what done looks like, then make it grade itself:</p>
+<div class="snip"><pre id="p18">Here's what this needs to have: [YOUR CHECKLIST]. Go through it item by item and tell me which ones aren't met yet.</pre><button class="copy" data-for="p18">Copy</button></div>
+<p>It's still your job to read the result. But it's a lot faster to check a list than to reread
+three pages.</p>
+<h3 id="when-a-long-chat-goes-sideways">When a long chat goes sideways</h3>
+<p>It's forgetting things you said, contradicting itself, or getting worse with every answer. Don't
+keep pushing. Start over, and bring the good parts with you:</p>
+<div class="snip"><pre id="p19">Write me a prompt I can paste into a new chat that picks up exactly where we are: what we're making, every decision we've made, and what's left to do.</pre><button class="copy" data-for="p19">Copy</button></div>
+<p>Paste that into a new chat. A clean start with a good summary usually beats message forty of the old one.</p>
+<footer>
+  <p><em>Free to reuse in your own classroom or PD. Attribution appreciated, not required.</em></p>
+  <p><a href="prompting-cheat-sheet.md">Markdown version</a> · <a href="https://github.com/parties/ai-workshop">The full workshop handout</a></p>
+</footer>
+</main>
+<script>
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest && ev.target.closest('.copy');
+  if(!b) return;
+  var txt=document.getElementById(b.dataset.for).textContent;
+  var done=function(){
+    var old=b.textContent;
+    b.textContent='Copied'; b.classList.add('done');
+    setTimeout(function(){ b.textContent=old; b.classList.remove('done'); },1600);
+  };
+  // Clipboard API is blocked in some file:// contexts, so keep the execCommand path as the fallback.
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done,function(){ legacy(txt,done); });
+  } else { legacy(txt,done); }
+});
+function legacy(txt,done){
+  var ta=document.createElement('textarea');
+  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ ta.select(); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
