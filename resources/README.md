@@ -57,3 +57,9 @@ Facilitation notes for the group walkthrough:
 - The **format** suggestion that usually cracks it open: a ranked table with a justification column. Ranking forces judgment in a way listing never does.
 - **Voice** options that change the answer completely: a new hire on day one, an insurance adjuster after an incident, a shop supervisor with a deadline.
 - The **context** a room will always forget: that the objective is *prioritizing*, not recall. Point at it when they skip it.
+
+For the [second opinion](prompting-cheat-sheet.md#get-a-second-opinion) loop:
+
+- Run it live on one AI-made lesson plan. Review it in a fresh chat against a short rubric the room agrees on.
+- Make sure at least one finding is wrong, and **reject it out loud**, with your reason. That rejection is the lesson. Everyone wants to skip the sorting step and paste the whole list back.
+- If the reviewer happens to get everything right, ask it for "five more problems." Padding shows up fast, and now you have something to reject.
