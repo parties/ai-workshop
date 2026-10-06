@@ -23,6 +23,8 @@ button in the corner. Swap out anything in `[BRACKETS]`.
 | Lost you three messages ago | *"I don't follow. Re-explain with more context and no jargon."* | [↓](#when-you-cant-follow-it) |
 | Reprints the whole document every time you change one line | *"Put this in a document and edit it there."* | [↓](#asking-for-a-document) |
 | Forgets things you told it earlier | Start a new chat with a summary. | [↓](#when-a-long-chat-goes-sideways) |
+| Needs to continue tomorrow, or in a new chat | Ask for a handoff document, then read it. | [↓](#hand-off-to-a-new-chat) |
+| Made something you're not sure about | Have a fresh chat review it against your rubric. | [↓](#get-a-second-opinion) |
 
 ---
 
@@ -248,6 +250,54 @@ Write me a prompt I can paste into a new chat that picks up exactly where we are
 ```
 
 Paste that into a new chat. A clean start with a good summary usually beats message forty of the old one.
+
+For anything bigger than one sitting, use a full [handoff document](#hand-off-to-a-new-chat) instead.
+
+---
+
+## 5. Working across chats
+
+### Hand off to a new chat
+
+The bigger version of [starting fresh](#when-a-long-chat-goes-sideways). Use it when work runs
+over more than one sitting, or when you want a clean chat to pick up where a messy one left off.
+
+```
+Write a handoff document for a new chat that will continue this work. It has seen none of this conversation. Include: what we're making and who it's for, every decision we made and why, what's finished, what's left (in order), open questions, and anything the next chat must NOT change. Put it in a document so I can edit it before I use it.
+```
+
+**Read it before you paste it.** It will leave out exactly the things it lost track of, and
+you're the only one who'll notice. Fix it, then paste it into the new chat along with any files
+the work depends on. The new chat can't see attachments from the old one.
+
+Working in a Project? Save the handoff to the project files and every new chat starts with it.
+
+### Get a second opinion
+
+The chat that made something is grading its own homework. A fresh chat sees only what's on the
+page, the way a sub or a student would. Four steps: **make it, review it in a fresh chat, sort
+the feedback yourself, revise.**
+
+Paste this into a new chat, with the work attached:
+
+```
+You're reviewing [WHAT IT IS] for [WHO IT'S FOR]. Someone else wrote it. Don't rewrite it.
+
+Check it against: [YOUR RUBRIC, REQUIREMENTS, OR CHECKLIST]
+
+Give me a numbered list of problems, worst first. For each one: quote the exact part, say why it matters for [WHO IT'S FOR], and suggest a fix in one sentence. Skip anything that's fine. If you're not sure something is a problem, say so.
+```
+
+Then sort the list. **This is the step that matters.** The reviewer is wrong sometimes too, so
+decide which problems are real before anything gets fixed. Take only those back to the
+original chat:
+
+```
+A reviewer flagged these problems: [PASTE THE ONES YOU AGREE WITH]. Fix only these. Leave everything else alone.
+```
+
+Want a sharper review? Use a different AI for it. Have Claude check ChatGPT's lesson plan, or
+the other way around. Different models tend to miss different things.
 
 ---
 
